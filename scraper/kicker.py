@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 import requests
 from bs4 import BeautifulSoup
 from dataclasses import dataclass
+from typing import Optional, List
 
 
 @dataclass
@@ -8,8 +11,8 @@ class Match:
     league: str
     team_home: str
     team_away: str
-    score_home: int | None
-    score_away: int | None
+    score_home: Optional[int]
+    score_away: Optional[int]
     status: str  # z.B. "Live", "45'", "Beendet", "18:30"
 
 
@@ -27,7 +30,7 @@ class KickerScraper:
         "Accept-Language": "de-DE,de;q=0.9",
     }
 
-    def fetch_live_scores(self) -> list[Match]:
+    def fetch_live_scores(self) -> List[Match]:
         """Holt aktuelle Live-Ergebnisse von kicker.de."""
         try:
             resp = requests.get(
@@ -39,10 +42,10 @@ class KickerScraper:
 
         return self._parse_html(resp.text)
 
-    def _parse_html(self, html: str) -> list[Match]:
+    def _parse_html(self, html: str) -> List[Match]:
         """Parsed HTML und extrahiert Spieldaten."""
         soup = BeautifulSoup(html, "html.parser")
-        matches: list[Match] = []
+        matches: List[Match] = []
         current_league = "Unbekannt"
 
         # Kicker strukturiert nach Ligen-Blöcken
@@ -75,7 +78,7 @@ class KickerScraper:
 
         return matches
 
-    def _parse_match_row(self, row, league: str) -> Match | None:
+    def _parse_match_row(self, row, league: str) -> Optional[Match]:
         """Parsed eine einzelne Spielzeile."""
         try:
             # Teams finden
@@ -133,9 +136,9 @@ class KickerScraper:
         except Exception:
             return None
 
-    def _parse_fallback(self, soup: BeautifulSoup) -> list[Match]:
+    def _parse_fallback(self, soup: BeautifulSoup) -> List[Match]:
         """Fallback-Parser wenn die strukturierte Suche nichts findet."""
-        matches: list[Match] = []
+        matches: List[Match] = []
 
         for container in soup.select(
             "div[class*='live'], div[class*='match'], "
@@ -165,7 +168,7 @@ class KickerScraper:
         return matches
 
 
-def get_demo_data() -> list[Match]:
+def get_demo_data() -> List[Match]:
     """Liefert Demo-Daten für Entwicklung und Tests."""
     return [
         Match("Bundesliga", "Bayern München", "Borussia Dortmund", 2, 1, "67'"),

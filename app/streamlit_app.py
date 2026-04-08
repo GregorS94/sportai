@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import streamlit as st
 from scraper.kicker import KickerScraper, Match, get_demo_data
+from typing import List, Dict
 
 
 # ─── Seiten-Konfiguration ───────────────────────────────────────────────
@@ -230,7 +233,7 @@ if load_demo:
     st.session_state.matches = get_demo_data()
     st.session_state.source = "demo"
 
-matches: list[Match] = st.session_state.matches
+matches: List[Match] = st.session_state.matches
 
 # ─── Statistik-Karten ────────────────────────────────────────────────────
 if matches:
@@ -266,7 +269,7 @@ if matches:
     st.markdown("")
 
     # Gruppiere nach Liga
-    leagues_dict: dict[str, list[Match]] = {}
+    leagues_dict: Dict[str, List[Match]] = {}
     for m in matches:
         leagues_dict.setdefault(m.league, []).append(m)
 
