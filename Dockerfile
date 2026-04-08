@@ -1,15 +1,21 @@
-FROM python:3.10-slim
+FROM python:3.12-slim
 
-# Basisverzeichnis im Container setzen
 WORKDIR /app
 
-# Requirements installieren
+# Dependencies zuerst (Docker Layer Caching)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Rest des Codes kopieren
+# App-Code kopieren
 COPY . .
 
-# Streamlit starten
-CMD ["streamlit", "run", "app/streamlit_app.py", "--server.port=8501", "--server.enableCORS=false"]
+EXPOSE 8501
 
+HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
+    CMD curl -f http://localhost:8501/_stcore/health || exit 1
+
+CMD ["streamlit", "run", "app/streamlit_app.py", \
+     "--server.port=8501", \
+     "--server.address=0.0.0.0", \
+     "--server.enableCORS=false", \
+     "--server.enableXsrfProtection=false"]
