@@ -1,8 +1,17 @@
 from __future__ import annotations
 
+import sys
+import os
+from pathlib import Path
+from typing import List
+
+# Ensure project root is on sys.path (needed for Streamlit Cloud)
+_root = str(Path(__file__).resolve().parent.parent)
+if _root not in sys.path:
+    sys.path.insert(0, _root)
+
 import streamlit as st
 from scraper.kicker import KickerScraper, Match, get_demo_data
-from typing import List
 
 # ─── Seiten-Konfiguration ───────────────────────────────────────────────
 st.set_page_config(
