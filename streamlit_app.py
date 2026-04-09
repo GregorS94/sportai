@@ -399,7 +399,7 @@ if load_demo:
 if load_api:
     key = st.session_state.get("api_key", "")
     if not key:
-        st.warning("Bitte API-Key in der Sidebar eingeben (links oben ☰)")
+        st.warning("Bitte API-Key in der Sidebar eingeben (links oben ☰) oder in Streamlit Secrets hinterlegen.")
     else:
         from scraper.api_football import APIFootball
         client = APIFootball(key)
@@ -407,8 +407,12 @@ if load_api:
             try:
                 st.session_state.matches = client.get_live_matches()
                 if not st.session_state.matches:
-                    st.info("Keine Live-Spiele gerade. Versuche heutige Spiele...")
+                    st.info("Keine Live-Spiele gerade. Lade heutige Spiele...")
                     st.session_state.matches = client.get_todays_matches()
+                st.success(
+                    f"✅ {len(st.session_state.matches)} Spiele geladen "
+                    f"({client.requests_used} API-Requests verbraucht)"
+                )
             except Exception as e:
                 st.error(f"API Fehler: {e}")
 

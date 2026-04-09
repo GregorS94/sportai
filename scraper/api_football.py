@@ -15,6 +15,7 @@ class APIFootball:
         self.headers = {
             "x-apisports-key": api_key,
         }
+        self.requests_used = 0
 
     def _get(self, endpoint: str, params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         """Führt einen API-Request aus."""
@@ -22,40 +23,70 @@ class APIFootball:
             f"{self.BASE_URL}/{endpoint}",
             headers=self.headers,
             params=params or {},
-            timeout=10,
+            timeout=15,
         )
         resp.raise_for_status()
+        self.requests_used += 1
         data = resp.json()
 
         if data.get("errors"):
             errors = data["errors"]
-            if isinstance(errors, dict):
+            if isinstance(errors, dict) and errors:
                 msg = ", ".join(str(v) for v in errors.values())
-            else:
-                msg = str(errors)
-            raise ConnectionError(f"API-Football Fehler: {msg}")
+                raise ConnectionError(f"API-Football Fehler: {msg}")
 
         return data
 
     def get_live_matches(self) -> List[Match]:
-        """Holt alle aktuell laufenden Spiele mit Statistiken."""
+        """Holt alle aktuell laufenden Spiele mit Statistiken.
+
+        Nutzt nur 1 API-Request für die Spiele.
+        Dann 1 Request pro Spiel für Statistiken (max 10 Spiele).
+        """
         data = self._get("fixtures", params={"live": "all"})
         fixtures = data.get("response", [])
 
+        if not fixtures:
+            return []
+
         matches = []  # type: List[Match]
+        fixture_ids = []  # type: List[int]
+
         for fix in fixtures:
             match = self._parse_fixture(fix)
             if match:
+                fid = fix.get("fixture", {}).get("id")
+                # Inline-Statistiken direkt aus dem Fixture parsen
+                stats_list = fix.get("statistics")
+                if stats_list and isinstance(stats_list, list) and len(stats_list) >= 2:
+                    match.stats_home = self._parse_stats(
+                        stats_list[0].get("statistics", [])
+                    )
+                    match.stats_away = self._parse_stats(
+                        stats_list[1].get("statistics", [])
+                    )
+                    self._fix_possession(match)
+                elif fid:
+                    fixture_ids.append(fid)
+
+                match._fixture_id = fid  # type: ignore[attr-defined]
                 matches.append(match)
 
-        # Statistiken für jedes Spiel laden
+        # Für Spiele ohne Inline-Stats: einzeln laden (max 10, spart Requests)
+        stats_loaded = 0
         for match_obj in matches:
-            self._enrich_with_stats(match_obj, fixtures)
+            fid = getattr(match_obj, "_fixture_id", None)
+            if fid and fid in fixture_ids and stats_loaded < 10:
+                try:
+                    self._load_stats_for_match(match_obj, fid)
+                    stats_loaded += 1
+                except Exception:
+                    pass  # Behalte Default-Werte
 
         return matches
 
     def get_todays_matches(self) -> List[Match]:
-        """Holt alle heutigen Spiele (auch geplante)."""
+        """Holt alle heutigen Spiele (auch geplante). 1 API-Request."""
         import datetime
         today = datetime.date.today().isoformat()
         data = self._get("fixtures", params={"date": today})
@@ -70,7 +101,7 @@ class APIFootball:
         return matches
 
     def get_fixture_stats(self, fixture_id: int) -> Dict[str, MatchStats]:
-        """Holt detaillierte Statistiken für ein Spiel."""
+        """Holt detaillierte Statistiken für ein Spiel. 1 API-Request."""
         data = self._get("fixtures/statistics", params={"fixture": fixture_id})
         response = data.get("response", [])
 
@@ -83,7 +114,7 @@ class APIFootball:
         return result
 
     def check_api_status(self) -> Dict[str, Any]:
-        """Prüft API-Status und verbleibende Requests."""
+        """Prüft API-Status und verbleibende Requests. 1 API-Request."""
         data = self._get("status")
         response = data.get("response", {})
         account = response.get("account", {})
@@ -111,7 +142,7 @@ class APIFootball:
             short_status = status.get("short", "")
 
             if short_status in ("1H", "2H", "ET"):
-                minute = f"{elapsed}'" if elapsed else "0'"
+                minute = "%d'" % (elapsed or 0)
             elif short_status == "HT":
                 minute = "HZ"
             elif short_status == "FT":
@@ -119,9 +150,9 @@ class APIFootball:
             elif short_status == "NS":
                 minute = status.get("long", "Geplant")
             else:
-                minute = f"{elapsed}'" if elapsed else short_status
+                minute = "%d'" % elapsed if elapsed else short_status
 
-            # Country code -> Flag
+            # Country -> Flag
             country_code = league.get("country", "")
             flag = _country_to_flag(country_code)
 
@@ -144,54 +175,70 @@ class APIFootball:
         except Exception:
             return None
 
-    def _enrich_with_stats(self, match: Match, fixtures: List[Dict[str, Any]]):
-        """Reichert ein Match mit Statistiken an."""
-        # Finde fixture_id
-        for fix in fixtures:
-            teams = fix.get("teams", {})
-            if teams.get("home", {}).get("name") == match.team_home:
-                fixture_id = fix.get("fixture", {}).get("id")
-                if fixture_id:
-                    try:
-                        stats_map = self.get_fixture_stats(fixture_id)
-                        if match.team_home in stats_map:
-                            match.stats_home = stats_map[match.team_home]
-                        if match.team_away in stats_map:
-                            match.stats_away = stats_map[match.team_away]
-                    except Exception:
-                        pass
-                break
+    def _load_stats_for_match(self, match: Match, fixture_id: int):
+        """Lädt Statistiken für ein einzelnes Spiel. 1 API-Request."""
+        stats_map = self.get_fixture_stats(fixture_id)
+        if match.team_home in stats_map:
+            match.stats_home = stats_map[match.team_home]
+        if match.team_away in stats_map:
+            match.stats_away = stats_map[match.team_away]
+        self._fix_possession(match)
+
+    def _fix_possession(self, match: Match):
+        """Stellt sicher, dass Ballbesitz-Werte zusammen 100% ergeben."""
+        h = match.stats_home.possession
+        a = match.stats_away.possession
+        if h == 0 and a == 0:
+            match.stats_home.possession = 50
+            match.stats_away.possession = 50
+        elif h > 0 and a == 0:
+            match.stats_away.possession = 100 - h
+        elif a > 0 and h == 0:
+            match.stats_home.possession = 100 - a
 
     def _parse_stats(self, statistics: List[Dict[str, Any]]) -> MatchStats:
         """Parsed API-Football Statistiken in unser MatchStats-Format."""
-        stats = MatchStats()
         stat_map = {}  # type: Dict[str, Any]
-
         for s in statistics:
             stat_type = s.get("type", "")
             value = s.get("value")
             stat_map[stat_type] = value
 
-        stats.possession = _parse_pct(stat_map.get("Ball Possession"))
-        stats.shots_on_target = _parse_int(stat_map.get("Shots on Goal"))
-        stats.shots_off_target = _parse_int(stat_map.get("Shots off Goal"))
-        stats.corners = _parse_int(stat_map.get("Corner Kicks"))
-        stats.offsides = _parse_int(stat_map.get("Offsides"))
-        stats.fouls = _parse_int(stat_map.get("Fouls"))
-        stats.yellow_cards = _parse_int(stat_map.get("Yellow Cards"))
-        stats.red_cards = _parse_int(stat_map.get("Red Cards"))
-        stats.saves = _parse_int(stat_map.get("Goalkeeper Saves"))
-
-        # API-Football hat keine "Angriffe" direkt, berechne aus Total Shots + Blocked
+        possession = _parse_pct(stat_map.get("Ball Possession"))
+        shots_on = _parse_int(stat_map.get("Shots on Goal"))
+        shots_off = _parse_int(stat_map.get("Shots off Goal"))
+        corners = _parse_int(stat_map.get("Corner Kicks"))
+        offsides = _parse_int(stat_map.get("Offsides"))
+        fouls = _parse_int(stat_map.get("Fouls"))
+        yellows = _parse_int(stat_map.get("Yellow Cards"))
+        reds = _parse_int(stat_map.get("Red Cards"))
+        saves = _parse_int(stat_map.get("Goalkeeper Saves"))
         total_shots = _parse_int(stat_map.get("Total Shots"))
         blocked = _parse_int(stat_map.get("Blocked Shots"))
         total_passes = _parse_int(stat_map.get("Total passes"))
+        pass_accuracy = _parse_int(stat_map.get("Passes %"))
 
-        # Angriffe schätzen: basierend auf Pässe und Schüsse
-        stats.attacks = max(total_shots * 3, int(total_passes * 0.15)) if total_passes else total_shots * 4
-        stats.dangerous_attacks = total_shots + blocked
+        # Angriffe schätzen (API-Football liefert das nicht direkt)
+        if total_passes > 0:
+            attacks = max(total_shots * 3, int(total_passes * 0.15))
+        else:
+            attacks = total_shots * 4
+        dangerous = total_shots + blocked
 
-        return stats
+        return MatchStats(
+            attacks=attacks,
+            dangerous_attacks=dangerous,
+            possession=possession,
+            shots_on_target=shots_on,
+            shots_off_target=shots_off,
+            corners=corners,
+            goals=0,
+            yellow_cards=yellows,
+            red_cards=reds,
+            offsides=offsides,
+            fouls=fouls,
+            saves=saves,
+        )
 
 
 def _parse_int(value) -> int:
@@ -205,13 +252,13 @@ def _parse_int(value) -> int:
 
 
 def _parse_pct(value) -> int:
-    """Parsed einen Prozent-String wie '64%' zu int."""
+    """Parsed einen Prozent-String wie '64%' zu int. Gibt 0 bei None."""
     if value is None:
-        return 50
+        return 0
     try:
         return int(str(value).replace("%", "").strip())
     except (ValueError, TypeError):
-        return 50
+        return 0
 
 
 # Country name -> flag emoji mapping
