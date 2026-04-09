@@ -352,34 +352,28 @@ st.markdown(
 )
 
 
-# ─── Sidebar: API Key ───────────────────────────────────────────────────
+# ─── API Key: aus Streamlit Secrets oder manuelle Eingabe ────────────────
+# Streamlit Cloud: Key in Settings > Secrets eintragen als:
+#   API_FOOTBALL_KEY = "dein_key_hier"
+_default_key = st.secrets.get("API_FOOTBALL_KEY", "") if hasattr(st, "secrets") else ""
+
 with st.sidebar:
     st.markdown("### ⚙️ Einstellungen")
     api_key = st.text_input(
         "API-Football Key",
+        value=_default_key,
         type="password",
         help="Gratis Key von api-football.com (100 Requests/Tag)",
     )
     if api_key:
         st.session_state["api_key"] = api_key
-        # Check API status
-        try:
-            from scraper.api_football import APIFootball
-            client = APIFootball(api_key)
-            status = client.check_api_status()
-            st.success(
-                f"Plan: {status['plan']}  \n"
-                f"Requests: {status['requests_today']}/{status['requests_limit']}"
-            )
-        except Exception as e:
-            st.error(f"API Fehler: {e}")
 
     st.markdown("---")
     st.markdown(
         "**Gratis API Key holen:**  \n"
         "1. [api-football.com](https://www.api-football.com/) registrieren  \n"
         "2. Key aus Dashboard kopieren  \n"
-        "3. Hier einfügen  \n"
+        "3. Hier einfügen oder in Streamlit Cloud Secrets  \n"
         "  \n"
         "*Free: 100 Requests/Tag*"
     )
