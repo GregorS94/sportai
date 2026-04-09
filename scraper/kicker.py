@@ -11,7 +11,7 @@ import random
 class MatchStats:
     attacks: int = 0
     dangerous_attacks: int = 0
-    possession: int = 50
+    possession: int = 0
     shots_on_target: int = 0
     shots_off_target: int = 0
     corners: int = 0

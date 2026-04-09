@@ -38,10 +38,10 @@ class APIFootball:
         return data
 
     def get_live_matches(self) -> List[Match]:
-        """Holt alle aktuell laufenden Spiele mit Statistiken.
+        """Holt alle aktuell laufenden Spiele. Nur 1 API-Request!
 
-        Nutzt nur 1 API-Request für die Spiele.
-        Dann 1 Request pro Spiel für Statistiken (max 10 Spiele).
+        Stats werden NICHT einzeln geladen (spart API-Quota).
+        Nutze load_stats_for_matches() separat um Stats zu laden.
         """
         data = self._get("fixtures", params={"live": "all"})
         fixtures = data.get("response", [])
@@ -50,13 +50,14 @@ class APIFootball:
             return []
 
         matches = []  # type: List[Match]
-        fixture_ids = []  # type: List[int]
 
         for fix in fixtures:
             match = self._parse_fixture(fix)
             if match:
                 fid = fix.get("fixture", {}).get("id")
-                # Inline-Statistiken direkt aus dem Fixture parsen
+                match._fixture_id = fid  # type: ignore[attr-defined]
+
+                # Inline-Statistiken direkt aus dem Fixture parsen (falls vorhanden)
                 stats_list = fix.get("statistics")
                 if stats_list and isinstance(stats_list, list) and len(stats_list) >= 2:
                     match.stats_home = self._parse_stats(
@@ -66,24 +67,36 @@ class APIFootball:
                         stats_list[1].get("statistics", [])
                     )
                     self._fix_possession(match)
-                elif fid:
-                    fixture_ids.append(fid)
 
-                match._fixture_id = fid  # type: ignore[attr-defined]
                 matches.append(match)
 
-        # Für Spiele ohne Inline-Stats: einzeln laden (max 10, spart Requests)
-        stats_loaded = 0
-        for match_obj in matches:
-            fid = getattr(match_obj, "_fixture_id", None)
-            if fid and fid in fixture_ids and stats_loaded < 10:
-                try:
-                    self._load_stats_for_match(match_obj, fid)
-                    stats_loaded += 1
-                except Exception:
-                    pass  # Behalte Default-Werte
-
         return matches
+
+    def load_stats_for_matches(self, matches: List[Match], max_requests: int = 5) -> int:
+        """Lädt Stats einzeln nach. Gibt Anzahl geladener Stats zurück.
+
+        Nur für Spiele die noch keine Stats haben und mindestens 10 Min laufen.
+        """
+        loaded = 0
+        for m in matches:
+            if loaded >= max_requests:
+                break
+            # Nur Stats laden wenn noch keine da sind (alle 0)
+            if m.stats_home.shots_on_target > 0 or m.stats_away.shots_on_target > 0:
+                continue  # Hat schon Stats
+            # Nur für Spiele die schon etwas laufen
+            minute = _parse_minute(m.minute)
+            if minute < 10:
+                continue
+            fid = getattr(m, "_fixture_id", None)
+            if not fid:
+                continue
+            try:
+                self._load_stats_for_match(m, fid)
+                loaded += 1
+            except Exception:
+                pass
+        return loaded
 
     def get_todays_matches(self) -> List[Match]:
         """Holt alle heutigen Spiele (auch geplante). 1 API-Request."""
@@ -241,6 +254,17 @@ class APIFootball:
         )
 
 
+def _parse_minute(minute_str: str) -> int:
+    """Parsed '45+2' oder '67'' zu int."""
+    try:
+        cleaned = minute_str.replace("'", "").strip()
+        if "+" in cleaned:
+            return int(cleaned.split("+")[0])
+        return int(cleaned)
+    except (ValueError, TypeError):
+        return 0
+
+
 def _parse_int(value) -> int:
     """Parsed einen Wert zu int, gibt 0 bei None/Fehler zurück."""
     if value is None:
@@ -272,6 +296,23 @@ _COUNTRY_FLAGS = {
     "Romania": "🇷🇴", "Saudi-Arabia": "🇸🇦", "Japan": "🇯🇵", "South-Korea": "🇰🇷",
     "USA": "🇺🇸", "Mexico": "🇲🇽", "Scotland": "🏴󠁧󠁢󠁳󠁣󠁴󠁿", "Wales": "🏴󠁧󠁢󠁷󠁬󠁳󠁿",
     "Russia": "🇷🇺", "Ukraine": "🇺🇦", "China": "🇨🇳", "Australia": "🇦🇺",
+    "Egypt": "🇪🇬", "Morocco": "🇲🇦", "Tunisia": "🇹🇳", "Algeria": "🇩🇿",
+    "South-Africa": "🇿🇦", "Nigeria": "🇳🇬", "Ghana": "🇬🇭", "Kenya": "🇰🇪",
+    "India": "🇮🇳", "Indonesia": "🇮🇩", "Thailand": "🇹🇭", "Vietnam": "🇻🇳",
+    "Malaysia": "🇲🇾", "Iran": "🇮🇷", "Iraq": "🇮🇶", "Qatar": "🇶🇦",
+    "UAE": "🇦🇪", "Bahrain": "🇧🇭", "Kuwait": "🇰🇼", "Oman": "🇴🇲",
+    "Jordan": "🇯🇴", "Lebanon": "🇱🇧", "Israel": "🇮🇱", "Palestine": "🇵🇸",
+    "Hungary": "🇭🇺", "Bulgaria": "🇧🇬", "Slovakia": "🇸🇰", "Slovenia": "🇸🇮",
+    "Bosnia": "🇧🇦", "Bosnia-and-Herzegovina": "🇧🇦", "Montenegro": "🇲🇪",
+    "North-Macedonia": "🇲🇰", "Albania": "🇦🇱", "Kosovo": "🇽🇰",
+    "Finland": "🇫🇮", "Iceland": "🇮🇸", "Estonia": "🇪🇪", "Latvia": "🇱🇻",
+    "Lithuania": "🇱🇹", "Belarus": "🇧🇾", "Georgia": "🇬🇪", "Armenia": "🇦🇲",
+    "Azerbaijan": "🇦🇿", "Kazakhstan": "🇰🇿", "Uzbekistan": "🇺🇿",
+    "Peru": "🇵🇪", "Chile": "🇨🇱", "Ecuador": "🇪🇨", "Venezuela": "🇻🇪",
+    "Bolivia": "🇧🇴", "Paraguay": "🇵🇾", "Costa-Rica": "🇨🇷", "Panama": "🇵🇦",
+    "Honduras": "🇭🇳", "El-Salvador": "🇸🇻", "Guatemala": "🇬🇹",
+    "Jamaica": "🇯🇲", "Trinidad-and-Tobago": "🇹🇹", "Canada": "🇨🇦",
+    "New-Zealand": "🇳🇿", "Cyprus": "🇨🇾", "Malta": "🇲🇹", "Luxembourg": "🇱🇺",
     "World": "🌍",
 }
 

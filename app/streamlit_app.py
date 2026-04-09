@@ -403,16 +403,26 @@ if load_api:
     else:
         from scraper.api_football import APIFootball
         client = APIFootball(key)
-        with st.spinner("Lade Live-Daten von API-Football..."):
+        with st.spinner("Lade Live-Daten von API-Football... (1 Request)"):
             try:
                 st.session_state.matches = client.get_live_matches()
                 if not st.session_state.matches:
                     st.info("Keine Live-Spiele gerade. Lade heutige Spiele...")
                     st.session_state.matches = client.get_todays_matches()
-                st.success(
-                    f"✅ {len(st.session_state.matches)} Spiele geladen "
-                    f"({client.requests_used} API-Requests verbraucht)"
-                )
+
+                n = len(st.session_state.matches)
+                st.success(f"✅ {n} Spiele geladen ({client.requests_used} API-Request)")
+
+                # Stats nachladen (max 5 Requests extra)
+                if st.session_state.matches:
+                    with st.spinner("Lade Statistiken für laufende Spiele..."):
+                        stats_loaded = client.load_stats_for_matches(
+                            st.session_state.matches, max_requests=5
+                        )
+                        if stats_loaded > 0:
+                            st.info(f"📊 Stats für {stats_loaded} Spiele geladen (+{stats_loaded} Requests)")
+                        else:
+                            st.info("ℹ️ Keine Stats verfügbar (Free Tier: Stats nur für Top-Ligen)")
             except Exception as e:
                 st.error(f"API Fehler: {e}")
 
@@ -537,8 +547,11 @@ def _render_match_rows(m, signals, is_pinned=False):
 
     atk_h, atk_a = highlight_val(h.attacks, a.attacks)
     datk_h, datk_a = highlight_val(h.dangerous_attacks, a.dangerous_attacks)
-    poss_h_cls = "poss-dominant" if h.possession > a.possession else "poss-text"
-    poss_a_cls = "poss-dominant" if a.possession > h.possession else "poss-text"
+    has_poss = h.possession > 0 or a.possession > 0
+    poss_h_cls = "poss-dominant" if has_poss and h.possession > a.possession else "poss-text"
+    poss_a_cls = "poss-dominant" if has_poss and a.possession > h.possession else "poss-text"
+    poss_h_str = "%d%%" % h.possession if has_poss else "—"
+    poss_a_str = "%d%%" % a.possession if has_poss else "—"
     sot_h, sot_a = highlight_val(h.shots_on_target, a.shots_on_target)
     soff_h, soff_a = highlight_val(h.shots_off_target, a.shots_off_target)
     cor_h, cor_a = highlight_val(h.corners, a.corners)
@@ -555,7 +568,7 @@ def _render_match_rows(m, signals, is_pinned=False):
         '<td class="col-team"><span class="flag">%s</span><span class="team-home">%s</span></td>'
         '<td class="%s">%d</td>'
         '<td class="%s">%d</td>'
-        '<td class="%s">%d%%</td>'
+        '<td class="%s">%s</td>'
         '<td class="%s">%d</td>'
         '<td class="%s">%d</td>'
         '<td class="%s">%d</td>'
@@ -571,7 +584,7 @@ def _render_match_rows(m, signals, is_pinned=False):
         row_class, m.minute, m.score_home,
         m.country_home, m.team_home,
         atk_h, h.attacks, datk_h, h.dangerous_attacks,
-        poss_h_cls, h.possession,
+        poss_h_cls, poss_h_str,
         sot_h, h.shots_on_target, soff_h, h.shots_off_target,
         cor_h, h.corners, g_h, h.goals, sv_h, h.saves,
         fl_h, h.fouls,
@@ -585,7 +598,7 @@ def _render_match_rows(m, signals, is_pinned=False):
         '<td class="col-team"><span class="flag">%s</span><span class="team-away">%s</span></td>'
         '<td class="%s">%d</td>'
         '<td class="%s">%d</td>'
-        '<td class="%s">%d%%</td>'
+        '<td class="%s">%s</td>'
         '<td class="%s">%d</td>'
         '<td class="%s">%d</td>'
         '<td class="%s">%d</td>'
@@ -600,7 +613,7 @@ def _render_match_rows(m, signals, is_pinned=False):
         row_class, m.score_away,
         m.country_away, m.team_away,
         atk_a, a.attacks, datk_a, a.dangerous_attacks,
-        poss_a_cls, a.possession,
+        poss_a_cls, poss_a_str,
         sot_a, a.shots_on_target, soff_a, a.shots_off_target,
         cor_a, a.corners, g_a, a.goals, sv_a, a.saves,
         fl_a, a.fouls,
