@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-from typing import List
+from typing import List, Dict
 
 import streamlit as st
-from scraper.kicker import KickerScraper, Match, get_demo_data
+from scraper.kicker import Match, get_demo_data
+from scraper.signals import analyze_match, Signal, SIGNAL_COLORS, SIGNAL_ICONS
 
 # ─── Seiten-Konfiguration ───────────────────────────────────────────────
 st.set_page_config(
@@ -93,7 +94,7 @@ st.markdown(
         width: 100%;
         border-collapse: collapse;
         font-size: 0.82rem;
-        min-width: 1100px;
+        min-width: 1200px;
     }
     .stats-table thead th {
         background: #151515;
@@ -115,6 +116,16 @@ st.markdown(
         font-size: 0.75rem;
         letter-spacing: 1px;
         text-transform: uppercase;
+    }
+    .stats-table thead th.col-signals {
+        text-align: left;
+        padding-left: 8px;
+        color: #d4a017;
+        font-weight: 600;
+        font-size: 0.75rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        min-width: 180px;
     }
 
     /* Row styles */
@@ -196,25 +207,38 @@ st.markdown(
         padding: 2px 6px;
     }
 
-    /* Possession bar */
-    .poss-text {
-        font-size: 0.8rem;
-        font-weight: 500;
-    }
+    /* Possession */
+    .poss-text { font-size: 0.8rem; font-weight: 500; }
     .poss-dominant { color: #d4a017; font-weight: 600; }
 
     /* Two-row per match layout */
     .match-row-home td { padding-top: 8px; padding-bottom: 2px; }
     .match-row-away td { padding-top: 2px; padding-bottom: 8px; }
 
-    /* Separator between minute group */
-    .minute-cell {
-        vertical-align: middle;
-    }
+    .minute-cell { vertical-align: middle; }
 
     /* Cards colors */
     .yellow-card { color: #f1c40f; }
     .red-card { color: #e74c3c; }
+
+    /* ─── Signal Badges ─── */
+    .signal-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        margin: 1px 2px;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+    }
+    .signal-over { background: #e74c3c22; color: #e74c3c; border: 1px solid #e74c3c44; }
+    .signal-comeback { background: #3498db22; color: #3498db; border: 1px solid #3498db44; }
+    .signal-corner { background: #f39c1222; color: #f39c12; border: 1px solid #f39c1244; }
+    .signal-cards { background: #f1c40f22; color: #f1c40f; border: 1px solid #f1c40f44; }
+    .signal-btts { background: #2ecc7122; color: #2ecc71; border: 1px solid #2ecc7144; }
+    .signal-strength-3 { font-size: 0.75rem; padding: 3px 10px; }
+    .signal-cell { text-align: left !important; padding-left: 8px !important; }
 
     /* Feature cards */
     .feature-cards {
@@ -232,20 +256,9 @@ st.markdown(
         min-width: 150px;
         text-align: center;
     }
-    .feature-card .fc-icon {
-        font-size: 1.5rem;
-        margin-bottom: 0.5rem;
-    }
-    .feature-card .fc-title {
-        color: #fff;
-        font-weight: 600;
-        font-size: 0.9rem;
-    }
-    .feature-card .fc-sub {
-        color: #d4a017;
-        font-weight: 600;
-        font-size: 0.85rem;
-    }
+    .feature-card .fc-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .feature-card .fc-title { color: #fff; font-weight: 600; font-size: 0.9rem; }
+    .feature-card .fc-sub { color: #d4a017; font-weight: 600; font-size: 0.85rem; }
 
     /* Button overrides */
     .stButton > button {
@@ -259,6 +272,32 @@ st.markdown(
     .stButton > button:hover {
         background: #d4a017 !important;
         color: #000 !important;
+    }
+
+    /* Sidebar / API key input */
+    .stTextInput input {
+        background: #1a1a1a !important;
+        color: #e0e0e0 !important;
+        border: 1px solid #333 !important;
+    }
+
+    /* Signal legend */
+    .signal-legend {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin: 0.8rem 0;
+        padding: 0.6rem 1rem;
+        background: #111;
+        border-radius: 8px;
+        border: 1px solid #1a1a1a;
+    }
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.75rem;
+        color: #888;
     }
     </style>
     """,
@@ -313,18 +352,74 @@ st.markdown(
 )
 
 
+# ─── Sidebar: API Key ───────────────────────────────────────────────────
+with st.sidebar:
+    st.markdown("### ⚙️ Einstellungen")
+    api_key = st.text_input(
+        "API-Football Key",
+        type="password",
+        help="Gratis Key von api-football.com (100 Requests/Tag)",
+    )
+    if api_key:
+        st.session_state["api_key"] = api_key
+        # Check API status
+        try:
+            from scraper.api_football import APIFootball
+            client = APIFootball(api_key)
+            status = client.check_api_status()
+            st.success(
+                f"Plan: {status['plan']}  \n"
+                f"Requests: {status['requests_today']}/{status['requests_limit']}"
+            )
+        except Exception as e:
+            st.error(f"API Fehler: {e}")
+
+    st.markdown("---")
+    st.markdown(
+        "**Gratis API Key holen:**  \n"
+        "1. [api-football.com](https://www.api-football.com/) registrieren  \n"
+        "2. Key aus Dashboard kopieren  \n"
+        "3. Hier einfügen  \n"
+        "  \n"
+        "*Free: 100 Requests/Tag*"
+    )
+
+
 # ─── Buttons ─────────────────────────────────────────────────────────────
-col1, col2, col3 = st.columns([1, 1, 4])
+col1, col2, col3, col4 = st.columns([1, 1, 1, 3])
 with col1:
-    load_live = st.button("🔄 Live-Daten laden", use_container_width=True)
-with col2:
     load_demo = st.button("📋 Demo-Daten", use_container_width=True)
+with col2:
+    load_api = st.button("⚡ API Live-Daten", use_container_width=True)
+with col3:
+    load_kicker = st.button("🔄 Kicker Scraper", use_container_width=True)
+
 
 # ─── State Management ────────────────────────────────────────────────────
 if "matches" not in st.session_state:
     st.session_state.matches = []  # type: List[Match]
 
-if load_live:
+if load_demo:
+    st.session_state.matches = get_demo_data()
+
+if load_api:
+    key = st.session_state.get("api_key", "")
+    if not key:
+        st.warning("Bitte API-Key in der Sidebar eingeben (links oben ☰)")
+    else:
+        from scraper.api_football import APIFootball
+        client = APIFootball(key)
+        with st.spinner("Lade Live-Daten von API-Football..."):
+            try:
+                st.session_state.matches = client.get_live_matches()
+                if not st.session_state.matches:
+                    st.info("Keine Live-Spiele gerade. Versuche heutige Spiele...")
+                    st.session_state.matches = client.get_todays_matches()
+            except Exception as e:
+                st.error(f"API Fehler: {e}")
+
+if load_kicker:
+    from scraper.kicker import KickerScraper
     scraper = KickerScraper()
     with st.spinner("Lade Live-Daten von kicker.de..."):
         try:
@@ -334,10 +429,23 @@ if load_live:
         except ConnectionError as e:
             st.error(str(e))
 
-if load_demo:
-    st.session_state.matches = get_demo_data()
-
 matches = st.session_state.matches  # type: List[Match]
+
+
+# ─── Signal Legend ───────────────────────────────────────────────────────
+if matches:
+    st.markdown(
+        """
+        <div class="signal-legend">
+            <div class="legend-item"><span class="signal-badge signal-over">OVER</span> Tore wahrscheinlich</div>
+            <div class="legend-item"><span class="signal-badge signal-comeback">COMEBACK</span> Aufholjagd</div>
+            <div class="legend-item"><span class="signal-badge signal-corner">CORNERS</span> Ecken-Signal</div>
+            <div class="legend-item"><span class="signal-badge signal-cards">KARTE</span> Gelbe/Rote Karte</div>
+            <div class="legend-item"><span class="signal-badge signal-btts">BTTS</span> Beide treffen</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 # ─── Render Table ────────────────────────────────────────────────────────
@@ -350,15 +458,34 @@ def highlight_val(val_home, val_away):
     return "stat-val", "stat-val"
 
 
+def render_signals_html(signals):
+    """Rendert Signal-Badges als HTML."""
+    if not signals:
+        return ""
+    html_parts = []
+    for sig in signals:
+        strength_cls = "signal-strength-3" if sig.strength >= 3 else ""
+        icon = SIGNAL_ICONS.get(sig.type, "")
+        html_parts.append(
+            '<span class="signal-badge signal-%s %s" title="%s">%s %s</span>'
+            % (sig.type, strength_cls, sig.reason, icon, sig.label)
+        )
+    return " ".join(html_parts)
+
+
 def render_table(matches_list):
-    """Rendert die BetScope-Style Statistik-Tabelle."""
+    """Rendert die BetScope-Style Statistik-Tabelle mit Signalen."""
     if not matches_list:
         return
 
-    pinned = [m for m in matches_list if m.pinned]
-    unpinned = [m for m in matches_list if not m.pinned]
+    # Berechne Signale für alle Spiele
+    match_signals = {}  # type: Dict[int, List[Signal]]
+    for i, m in enumerate(matches_list):
+        match_signals[i] = analyze_match(m)
 
-    # Column headers with icons
+    pinned = [(i, m) for i, m in enumerate(matches_list) if m.pinned]
+    unpinned = [(i, m) for i, m in enumerate(matches_list) if not m.pinned]
+
     header = """
     <div class="stats-table-wrapper">
     <table class="stats-table">
@@ -379,6 +506,7 @@ def render_table(matches_list):
             <th title="Gelbe Karten">🟨</th>
             <th title="Rote Karten">🟥</th>
             <th title="Abseits">🚫</th>
+            <th class="col-signals">SIGNALE</th>
         </tr>
     </thead>
     <tbody>
@@ -386,15 +514,13 @@ def render_table(matches_list):
 
     rows = ""
 
-    # Pinned section
     if pinned:
-        rows += '<tr class="pinned-section"><td colspan="15" class="pinned-label">📌 FIXIERT (%d)</td></tr>' % len(pinned)
-        for m in pinned:
-            rows += _render_match_rows(m, pinned=True)
+        rows += '<tr class="pinned-section"><td colspan="16" class="pinned-label">📌 FIXIERT (%d)</td></tr>' % len(pinned)
+        for i, m in pinned:
+            rows += _render_match_rows(m, match_signals.get(i, []), is_pinned=True)
 
-    # Regular matches
-    for m in unpinned:
-        rows += _render_match_rows(m, pinned=False)
+    for i, m in unpinned:
+        rows += _render_match_rows(m, match_signals.get(i, []), is_pinned=False)
 
     footer = """
     </tbody>
@@ -405,13 +531,12 @@ def render_table(matches_list):
     st.markdown(header + rows + footer, unsafe_allow_html=True)
 
 
-def _render_match_rows(m, pinned=False):
+def _render_match_rows(m, signals, is_pinned=False):
     """Rendert zwei Zeilen (Home + Away) für ein Match."""
-    row_class = "row-pinned" if pinned else ""
+    row_class = "row-pinned" if is_pinned else ""
     h = m.stats_home
     a = m.stats_away
 
-    # Determine highlights per stat
     atk_h, atk_a = highlight_val(h.attacks, a.attacks)
     datk_h, datk_a = highlight_val(h.dangerous_attacks, a.dangerous_attacks)
     poss_h_cls = "poss-dominant" if h.possession > a.possession else "poss-text"
@@ -423,7 +548,8 @@ def _render_match_rows(m, pinned=False):
     sv_h, sv_a = highlight_val(h.saves, a.saves)
     fl_h, fl_a = highlight_val(h.fouls, a.fouls)
 
-    # Home row
+    signals_html = render_signals_html(signals)
+
     home_row = (
         '<tr class="match-row-home %s">'
         '<td class="col-minute minute-cell" rowspan="2">%s</td>'
@@ -441,6 +567,7 @@ def _render_match_rows(m, pinned=False):
         '<td class="yellow-card">%d</td>'
         '<td class="red-card">%d</td>'
         '<td class="stat-val">%d</td>'
+        '<td class="signal-cell" rowspan="2">%s</td>'
         '</tr>'
     ) % (
         row_class, m.minute, m.score_home,
@@ -451,9 +578,9 @@ def _render_match_rows(m, pinned=False):
         cor_h, h.corners, g_h, h.goals, sv_h, h.saves,
         fl_h, h.fouls,
         h.yellow_cards, h.red_cards, h.offsides,
+        signals_html,
     )
 
-    # Away row
     away_row = (
         '<tr class="match-row-away %s">'
         '<td class="col-score">%d</td>'
