@@ -352,41 +352,14 @@ st.markdown(
 )
 
 
-# ─── API Key: aus Streamlit Secrets oder manuelle Eingabe ────────────────
-# Streamlit Cloud: Key in Settings > Secrets eintragen als:
-#   API_FOOTBALL_KEY = "dein_key_hier"
-_default_key = st.secrets.get("API_FOOTBALL_KEY", "") if hasattr(st, "secrets") else ""
-
-with st.sidebar:
-    st.markdown("### ⚙️ Einstellungen")
-    api_key = st.text_input(
-        "API-Football Key",
-        value=_default_key,
-        type="password",
-        help="Gratis Key von api-football.com (100 Requests/Tag)",
-    )
-    if api_key:
-        st.session_state["api_key"] = api_key
-
-    st.markdown("---")
-    st.markdown(
-        "**Gratis API Key holen:**  \n"
-        "1. [api-football.com](https://www.api-football.com/) registrieren  \n"
-        "2. Key aus Dashboard kopieren  \n"
-        "3. Hier einfügen oder in Streamlit Cloud Secrets  \n"
-        "  \n"
-        "*Free: 100 Requests/Tag*"
-    )
 
 
 # ─── Buttons ─────────────────────────────────────────────────────────────
-col1, col2, col3, col4 = st.columns([1, 1, 1, 3])
+col1, col2, col3 = st.columns([1, 1, 4])
 with col1:
-    load_demo = st.button("📋 Demo-Daten", use_container_width=True)
+    load_sofa = st.button("⚡ LIVE Daten", use_container_width=True)
 with col2:
-    load_api = st.button("⚡ API Live-Daten", use_container_width=True)
-with col3:
-    load_kicker = st.button("🔄 Kicker Scraper", use_container_width=True)
+    load_demo = st.button("📋 Demo-Daten", use_container_width=True)
 
 
 # ─── State Management ────────────────────────────────────────────────────
@@ -396,46 +369,24 @@ if "matches" not in st.session_state:
 if load_demo:
     st.session_state.matches = get_demo_data()
 
-if load_api:
-    key = st.session_state.get("api_key", "")
-    if not key:
-        st.warning("Bitte API-Key in der Sidebar eingeben (links oben ☰) oder in Streamlit Secrets hinterlegen.")
-    else:
-        from scraper.api_football import APIFootball
-        client = APIFootball(key)
-        with st.spinner("Lade Live-Daten von API-Football... (1 Request)"):
-            try:
-                st.session_state.matches = client.get_live_matches()
-                if not st.session_state.matches:
-                    st.info("Keine Live-Spiele gerade. Lade heutige Spiele...")
-                    st.session_state.matches = client.get_todays_matches()
-
-                n = len(st.session_state.matches)
-                st.success(f"✅ {n} Spiele geladen ({client.requests_used} API-Request)")
-
-                # Stats nachladen (max 5 Requests extra)
-                if st.session_state.matches:
-                    with st.spinner("Lade Statistiken für laufende Spiele..."):
-                        stats_loaded = client.load_stats_for_matches(
-                            st.session_state.matches, max_requests=5
-                        )
-                        if stats_loaded > 0:
-                            st.info(f"📊 Stats für {stats_loaded} Spiele geladen (+{stats_loaded} Requests)")
-                        else:
-                            st.info("ℹ️ Keine Stats verfügbar (Free Tier: Stats nur für Top-Ligen)")
-            except Exception as e:
-                st.error(f"API Fehler: {e}")
-
-if load_kicker:
-    from scraper.kicker import KickerScraper
-    scraper = KickerScraper()
-    with st.spinner("Lade Live-Daten von kicker.de..."):
+if load_sofa:
+    from scraper.sofascore import SofascoreClient
+    client = SofascoreClient()
+    with st.spinner("Lade Live-Spiele von Sofascore..."):
         try:
-            st.session_state.matches = scraper.fetch_live_scores()
-            if not st.session_state.matches:
-                st.info("Keine Live-Spiele gefunden.")
+            st.session_state.matches = client.get_live_matches()
+            n = len(st.session_state.matches)
+            if n == 0:
+                st.info("Keine Live-Spiele gerade.")
+            else:
+                st.success(f"✅ {n} Live-Spiele gefunden")
+                with st.spinner("Lade Statistiken..."):
+                    loaded = client.load_stats(st.session_state.matches, max_count=20)
+                    st.info(f"📊 Stats für {loaded}/{n} Spiele geladen")
         except ConnectionError as e:
             st.error(str(e))
+        except Exception as e:
+            st.error(f"Fehler: {e}")
 
 matches = st.session_state.matches  # type: List[Match]
 
