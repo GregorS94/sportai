@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Newsletter Designer</title>
+<link rel="stylesheet" href="/static/style.css" />
+</head>
+<body class="designer-body">
+<header class="designer-topbar">
+  <div class="left">
+    <a href="/" class="back-link">← Zurück</a>
+    <input id="newsletter-name" placeholder="Newsletter Name" />
+  </div>
+  <div class="center">
+    <input id="newsletter-subject" placeholder="Betreff der E-Mail" />
+  </div>
+  <div class="right">
+    <button class="btn" id="btn-preview">👁 Vorschau</button>
+    <button class="btn primary" id="btn-save">💾 Speichern</button>
+    <button class="btn success" id="btn-send">📤 Senden</button>
+  </div>
+</header>
+
+<div class="designer-layout">
+  <aside class="block-library">
+    <h3>Blöcke hinzufügen</h3>
+    <button class="block-add" data-block="heading">➕ Überschrift</button>
+    <button class="block-add" data-block="text">➕ Text</button>
+    <button class="block-add" data-block="image">➕ Bild</button>
+    <button class="block-add" data-block="button">➕ Button</button>
+    <button class="block-add" data-block="divider">➕ Trennlinie</button>
+    <button class="block-add" data-block="spacer">➕ Abstand</button>
+
+    <hr style="margin:20px 0;border:0;border-top:1px solid #e5e7eb;" />
+    <h3>Vorab-Text</h3>
+    <textarea id="newsletter-preheader" rows="3"
+      placeholder="Wird in der Posteingangs-Vorschau angezeigt"></textarea>
+    <p class="muted" style="margin-top:10px;">
+      Personalisierung über Platzhalter:<br />
+      <code>{{name}}</code>, <code>{{email}}</code>
+    </p>
+  </aside>
+
+  <main class="canvas-wrap">
+    <div class="canvas" id="canvas"></div>
+  </main>
+
+  <aside class="properties-panel" id="props-panel">
+    <h3>Eigenschaften</h3>
+    <p class="muted" id="props-empty">Wähle einen Block im Canvas, um ihn zu bearbeiten.</p>
+    <div id="props-content"></div>
+  </aside>
+</div>
+
+<!-- Send modal -->
+<div class="modal" id="send-modal" hidden>
+  <div class="modal-box">
+    <h2>Newsletter versenden</h2>
+    <p>Empfängerliste auswählen:</p>
+    <select id="send-list-select"></select>
+    <div class="modal-actions">
+      <button class="btn" id="btn-send-cancel">Abbrechen</button>
+      <button class="btn primary" id="btn-send-confirm">Jetzt senden</button>
+    </div>
+    <hr />
+    <p>Test-E-Mail an einzelne Adresse:</p>
+    <div class="inline-form">
+      <input id="test-email-input" type="email" placeholder="test@example.com" />
+      <button class="btn" id="btn-send-test">Test senden</button>
+    </div>
+    <p id="send-status" class="muted" style="margin-top:10px;"></p>
+  </div>
+</div>
+
+<!-- Preview modal -->
+<div class="modal" id="preview-modal" hidden>
+  <div class="modal-box wide">
+    <h2>Vorschau</h2>
+    <iframe id="preview-frame" class="preview-frame"></iframe>
+    <div class="modal-actions">
+      <button class="btn" id="btn-preview-close">Schließen</button>
+    </div>
+  </div>
+</div>
+
+<div id="status-bar" class="status-bar"></div>
+
+<script src="/static/designer.js"></script>
+</body>
+</html>
