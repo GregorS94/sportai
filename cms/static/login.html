@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Login · Seelenmut CMS</title>
+<link rel="stylesheet" href="/static/admin.css" />
+</head>
+<body class="login-body">
+<div class="login-card">
+  <h1>Seelenmut</h1>
+  <p class="tagline">Redaktion &amp; Content</p>
+  <div class="login-error" id="error"></div>
+  <form id="login-form">
+    <label>Benutzername
+      <input type="text" name="username" autocomplete="username" required autofocus />
+    </label>
+    <label>Passwort
+      <input type="password" name="password" autocomplete="current-password" required />
+    </label>
+    <button class="btn primary" type="submit">Einloggen</button>
+  </form>
+</div>
+<script>
+document.getElementById("login-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const err = document.getElementById("error");
+  err.classList.remove("show");
+  try {
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: form.username.value,
+        password: form.password.value,
+      }),
+    });
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}));
+      err.textContent = data.detail || "Login fehlgeschlagen";
+      err.classList.add("show");
+      return;
+    }
+    window.location.href = "/admin";
+  } catch (e) {
+    err.textContent = "Netzwerkfehler: " + e.message;
+    err.classList.add("show");
+  }
+});
+</script>
+</body>
+</html>
