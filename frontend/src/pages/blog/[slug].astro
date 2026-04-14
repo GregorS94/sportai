@@ -1,0 +1,69 @@
+---
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import { cms, formatDate, mediaUrl } from "~/lib/cms";
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect("/blog");
+
+let post;
+try {
+  post = await cms.post(slug);
+} catch (err) {
+  return new Response("Not found", { status: 404 });
+}
+
+const cover = mediaUrl(post.cover_image);
+---
+
+<BaseLayout title={post.meta.title || post.title} description={post.meta.description || post.excerpt} image={cover}>
+  <article class="mx-auto max-w-3xl px-6 pt-14 pb-20">
+    <a
+      href="/blog"
+      class="text-xs uppercase tracking-[0.2em] text-[color:var(--color-mute)] hover:text-[color:var(--color-clay)]"
+      >← Zurück zum Journal</a
+    >
+
+    <header class="mt-8 text-center">
+      {post.tags.length > 0 && (
+        <div class="flex justify-center flex-wrap gap-1.5 mb-5">
+          {post.tags.map((t) => (
+            <a
+              href={`/blog?tag=${t.slug}`}
+              class="text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full bg-[color:var(--color-cream-2)] text-[color:var(--color-bark)] hover:bg-[color:var(--color-clay-soft)] transition"
+            >
+              {t.name}
+            </a>
+          ))}
+        </div>
+      )}
+      <h1>{post.title}</h1>
+      {post.excerpt && (
+        <p class="mt-5 text-lg text-[color:var(--color-mute)] italic max-w-2xl mx-auto">
+          {post.excerpt}
+        </p>
+      )}
+      <div class="mt-5 text-sm text-[color:var(--color-mute)]">
+        {formatDate(post.published_at)}
+      </div>
+    </header>
+
+    {cover && (
+      <div class="mt-10 overflow-hidden rounded-2xl shadow-[0_20px_50px_rgba(43,42,38,0.12)]">
+        <img src={cover} alt={post.title} class="w-full h-auto" />
+      </div>
+    )}
+
+    <div class="prose mx-auto mt-12" set:html={post.content_html} />
+
+    <div class="mt-16 pt-10 border-t border-[color:var(--color-border)] text-center">
+      <p class="font-serif italic text-[color:var(--color-mute)]">
+        Hat dich dieser Text berührt? Teile ihn mit jemandem, der ihn gerade braucht.
+      </p>
+      <a
+        href="/blog"
+        class="mt-5 inline-block rounded-full border border-[color:var(--color-border)] px-6 py-2.5 text-sm text-[color:var(--color-bark)] hover:border-[color:var(--color-clay)] transition"
+        >Weitere Einträge</a
+      >
+    </div>
+  </article>
+</BaseLayout>

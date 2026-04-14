@@ -1,0 +1,83 @@
+---
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import PostCard from "~/components/PostCard.astro";
+import { cms, safe } from "~/lib/cms";
+
+const tag = Astro.url.searchParams.get("tag") || undefined;
+const { items: posts, total } = await safe(
+  cms.posts({ limit: 50, tag }),
+  { items: [], total: 0, limit: 50, offset: 0 }
+);
+const tags = await safe(cms.tags(), []);
+---
+
+<BaseLayout
+  title={tag ? `#${tag}` : "Journal"}
+  description="Blog & Journal – Gedanken rund um Achtsamkeit, Selbstliebe und innere Ruhe."
+>
+  <section class="mx-auto max-w-6xl px-6 pt-16 pb-10">
+    <div class="text-center">
+      <span class="text-xs uppercase tracking-[0.25em] text-[color:var(--color-clay)]">Journal</span>
+      <h1 class="mt-3">
+        {tag ? <>Gedanken zu <em class="italic text-[color:var(--color-clay)]">#{tag}</em></> : "Gedanken & Geschichten"}
+      </h1>
+      <p class="mt-4 max-w-xl mx-auto text-[color:var(--color-mute)]">
+        {total} {total === 1 ? "Eintrag" : "Einträge"} · frisch aus dem Herzen
+      </p>
+    </div>
+
+    {
+      tags.length > 0 && (
+        <div class="mt-10 flex flex-wrap justify-center gap-2">
+          <a
+            href="/blog"
+            class:list={[
+              "px-4 py-1.5 rounded-full text-sm border transition",
+              !tag
+                ? "bg-[color:var(--color-bark)] text-white border-[color:var(--color-bark)]"
+                : "bg-white border-[color:var(--color-border)] text-[color:var(--color-bark)] hover:border-[color:var(--color-clay)]",
+            ]}
+          >
+            Alle
+          </a>
+          {tags.map((t) => (
+            <a
+              href={`/blog?tag=${t.slug}`}
+              class:list={[
+                "px-4 py-1.5 rounded-full text-sm border transition",
+                tag === t.slug
+                  ? "bg-[color:var(--color-bark)] text-white border-[color:var(--color-bark)]"
+                  : "bg-white border-[color:var(--color-border)] text-[color:var(--color-bark)] hover:border-[color:var(--color-clay)]",
+              ]}
+            >
+              {t.name}
+              {t.count ? <span class="opacity-60 ml-1">·{t.count}</span> : null}
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </section>
+
+  <section class="mx-auto max-w-6xl px-6 pb-24">
+    {
+      posts.length === 0 ? (
+        <div class="rounded-2xl border border-dashed border-[color:var(--color-border)] bg-white/50 p-16 text-center">
+          <div class="text-3xl text-[color:var(--color-clay)]">❋</div>
+          <p class="mt-4 font-serif text-2xl text-[color:var(--color-bark)]">
+            Noch keine Einträge hier.
+          </p>
+          <p class="mt-2 text-sm text-[color:var(--color-mute)]">
+            Komm bald wieder – das erste Wort ist oft das leiseste.
+          </p>
+        </div>
+      ) : (
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {posts.map((p) => (
+            <PostCard post={p} />
+          ))}
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>

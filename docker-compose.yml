@@ -1,6 +1,7 @@
 version: "3.8"
 
 services:
+  # --- existing Streamlit app ---
   sportai:
     build: .
     container_name: sportai
@@ -10,3 +11,64 @@ services:
       - .:/app
     working_dir: /app
     restart: unless-stopped
+
+  # --- Seelenmut CMS (FastAPI + SQLite) ---
+  cms:
+    build: ./cms
+    container_name: seelenmut-cms
+    restart: unless-stopped
+    environment:
+      CMS_ADMIN_USER: ${CMS_ADMIN_USER:-admin}
+      CMS_ADMIN_PASSWORD: ${CMS_ADMIN_PASSWORD:-changeme}
+      CMS_SECRET_KEY: ${CMS_SECRET_KEY:-please-change-this-long-random-string}
+      CMS_DB: /app/data/cms.db
+      CMS_MEDIA_DIR: /app/data/media
+      CMS_CORS_ORIGINS: ${CMS_CORS_ORIGINS:-*}
+    volumes:
+      - cms_data:/app/data
+    expose:
+      - "8000"
+    networks:
+      - seelenmut
+
+  # --- Astro SSR frontend ---
+  frontend:
+    build: ./frontend
+    container_name: seelenmut-frontend
+    restart: unless-stopped
+    environment:
+      CMS_URL: http://cms:8000
+      PUBLIC_SITE_NAME: Seelenmut
+    depends_on:
+      - cms
+    expose:
+      - "4321"
+    networks:
+      - seelenmut
+
+  # --- Caddy reverse proxy (automatic HTTPS) ---
+  caddy:
+    image: caddy:2-alpine
+    container_name: seelenmut-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - cms
+    networks:
+      - seelenmut
+
+volumes:
+  cms_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  seelenmut:
+    driver: bridge

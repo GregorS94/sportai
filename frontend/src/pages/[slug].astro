@@ -1,0 +1,32 @@
+---
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import { cms } from "~/lib/cms";
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect("/");
+
+let page;
+try {
+  page = await cms.page(slug);
+} catch (err) {
+  return new Response("Not found", { status: 404 });
+}
+---
+
+<BaseLayout title={page.meta.title || page.title} description={page.meta.description || page.excerpt}>
+  <article class="mx-auto max-w-3xl px-6 pt-14 pb-20">
+    <header class="text-center">
+      <span class="text-xs uppercase tracking-[0.25em] text-[color:var(--color-clay)]">
+        Seelenmut
+      </span>
+      <h1 class="mt-3">{page.title}</h1>
+      {page.excerpt && (
+        <p class="mt-5 text-lg text-[color:var(--color-mute)] italic max-w-2xl mx-auto">
+          {page.excerpt}
+        </p>
+      )}
+    </header>
+
+    <div class="prose mx-auto mt-12" set:html={page.content_html} />
+  </article>
+</BaseLayout>

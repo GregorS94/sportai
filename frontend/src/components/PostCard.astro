@@ -1,0 +1,62 @@
+---
+import { formatDate, mediaUrl, type CmsPost } from "~/lib/cms";
+
+interface Props {
+  post: CmsPost;
+  featured?: boolean;
+}
+
+const { post, featured = false } = Astro.props;
+const cover = mediaUrl(post.cover_image);
+---
+
+<a
+  href={`/blog/${post.slug}`}
+  class:list={[
+    "group block rounded-2xl overflow-hidden bg-white border border-[color:var(--color-border)] transition-all hover:-translate-y-1 hover:shadow-[0_16px_40px_rgba(43,42,38,0.08)]",
+    featured ? "md:grid md:grid-cols-5 md:gap-0" : "",
+  ]}
+>
+  {cover && (
+    <div
+      class:list={[
+        "aspect-[4/3] bg-[color:var(--color-cream-2)] overflow-hidden",
+        featured ? "md:col-span-3 md:aspect-auto md:h-full" : "",
+      ]}
+    >
+      <img
+        src={cover}
+        alt={post.title}
+        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        loading="lazy"
+      />
+    </div>
+  )}
+  <div class:list={["p-6", featured ? "md:col-span-2 md:p-10 md:flex md:flex-col md:justify-center" : ""]}>
+    {post.tags.length > 0 && (
+      <div class="flex flex-wrap gap-1.5 mb-3">
+        {post.tags.slice(0, 3).map((t) => (
+          <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-[color:var(--color-cream-2)] text-[color:var(--color-bark)]">
+            {t.name}
+          </span>
+        ))}
+      </div>
+    )}
+    <h3
+      class:list={[
+        "font-serif text-[color:var(--color-bark)] group-hover:text-[color:var(--color-clay)] transition leading-tight",
+        featured ? "text-3xl md:text-4xl" : "text-xl",
+      ]}
+    >
+      {post.title}
+    </h3>
+    {post.excerpt && (
+      <p class="mt-3 text-[color:var(--color-mute)] text-sm leading-relaxed line-clamp-3">
+        {post.excerpt}
+      </p>
+    )}
+    <div class="mt-4 text-xs text-[color:var(--color-mute)] italic">
+      {formatDate(post.published_at)}
+    </div>
+  </div>
+</a>

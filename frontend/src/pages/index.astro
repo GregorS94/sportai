@@ -1,0 +1,130 @@
+---
+import BaseLayout from "~/layouts/BaseLayout.astro";
+import PostCard from "~/components/PostCard.astro";
+import { cms, safe } from "~/lib/cms";
+
+const { items: latestPosts } = await safe(cms.posts({ limit: 3 }), {
+  items: [],
+  total: 0,
+  limit: 3,
+  offset: 0,
+});
+---
+
+<BaseLayout title="Willkommen" description="Ein Ort für Achtsamkeit, Selbstliebe und den Mut, du selbst zu sein.">
+  <!-- Hero -->
+  <section class="relative">
+    <div class="mx-auto max-w-5xl px-6 pt-16 pb-20 md:pt-24 md:pb-28 text-center">
+      <div class="rise">
+        <span
+          class="inline-block text-xs uppercase tracking-[0.25em] text-[color:var(--color-clay)] mb-5"
+          >Seelenmut · Dein sanfter Ort</span
+        >
+      </div>
+      <h1 class="rise rise-delay-1 max-w-3xl mx-auto">
+        Finde den Mut,<br />
+        <em class="italic text-[color:var(--color-clay)]">ganz du selbst</em> zu sein.
+      </h1>
+      <p
+        class="rise rise-delay-2 mt-8 max-w-xl mx-auto text-lg text-[color:var(--color-mute)] leading-relaxed"
+      >
+        Geschichten, Impulse und Gedanken rund um Achtsamkeit, Selbstliebe und
+        das leise Wachsen nach innen. Hier darfst du ankommen – langsam, tief,
+        echt.
+      </p>
+      <div class="rise rise-delay-3 mt-10 flex items-center justify-center gap-3 flex-wrap">
+        <a
+          href="/blog"
+          class="inline-flex items-center gap-2 rounded-full bg-[color:var(--color-bark)] text-white px-7 py-3 text-sm font-medium hover:bg-[color:var(--color-bark-dark)] transition shadow-[0_10px_30px_rgba(107,91,69,0.18)]"
+        >
+          Zum Journal →
+        </a>
+        <a
+          href="#ueber"
+          class="inline-flex items-center gap-2 rounded-full border border-[color:var(--color-border)] bg-white/60 backdrop-blur px-7 py-3 text-sm font-medium text-[color:var(--color-bark)] hover:bg-white transition"
+        >
+          Über Seelenmut
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values / Intentions strip -->
+  <section id="ueber" class="mx-auto max-w-5xl px-6 pb-16">
+    <div class="grid md:grid-cols-3 gap-6">
+      {[
+        {
+          title: "Achtsam",
+          text: "Im Moment ankommen, ohne ihn festhalten zu müssen.",
+          mark: "❋",
+        },
+        {
+          title: "Ehrlich",
+          text: "Gefühle dürfen groß sein. Und klein. Und leise.",
+          mark: "✦",
+        },
+        {
+          title: "Mutig",
+          text: "Der sanfte Mut, dich selbst ernst zu nehmen.",
+          mark: "❀",
+        },
+      ].map((v) => (
+        <div class="rounded-2xl border border-[color:var(--color-border)] bg-white/70 backdrop-blur p-7 text-center hover:bg-white transition">
+          <div class="text-2xl text-[color:var(--color-clay)]">{v.mark}</div>
+          <h3 class="mt-3 font-serif text-2xl">{v.title}</h3>
+          <p class="mt-2 text-sm text-[color:var(--color-mute)] leading-relaxed">
+            {v.text}
+          </p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- Latest posts -->
+  {
+    latestPosts.length > 0 && (
+      <section class="mx-auto max-w-6xl px-6 pb-24">
+        <div class="flex items-end justify-between mb-10 flex-wrap gap-3">
+          <div>
+            <span class="text-xs uppercase tracking-[0.25em] text-[color:var(--color-clay)]">
+              Aus dem Journal
+            </span>
+            <h2 class="mt-2">Neueste Gedanken</h2>
+          </div>
+          <a
+            href="/blog"
+            class="text-sm text-[color:var(--color-bark)] hover:text-[color:var(--color-clay)] underline underline-offset-4 decoration-[color:var(--color-clay)]"
+          >
+            Alle Artikel →
+          </a>
+        </div>
+        <div class="grid gap-8">
+          {latestPosts[0] && <PostCard post={latestPosts[0]} featured />}
+          {latestPosts.length > 1 && (
+            <div class="grid md:grid-cols-2 gap-8">
+              {latestPosts.slice(1).map((p) => (
+                <PostCard post={p} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  }
+
+  {
+    latestPosts.length === 0 && (
+      <section class="mx-auto max-w-3xl px-6 pb-24 text-center">
+        <div class="rounded-2xl border border-dashed border-[color:var(--color-border)] bg-white/50 p-12">
+          <div class="text-3xl text-[color:var(--color-clay)]">❋</div>
+          <p class="mt-4 font-serif text-2xl text-[color:var(--color-bark)]">
+            Das Journal wartet auf seinen ersten Eintrag.
+          </p>
+          <p class="mt-2 text-sm text-[color:var(--color-mute)]">
+            Bald findest du hier die ersten Gedanken.
+          </p>
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>

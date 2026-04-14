@@ -1,0 +1,36 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-24 border-t border-[color:var(--color-border)] bg-[color:var(--color-cream-2)]/40">
+  <div class="mx-auto max-w-6xl px-6 py-12 grid gap-8 md:grid-cols-3">
+    <div>
+      <div class="font-serif text-2xl text-[color:var(--color-bark)]">Seelenmut</div>
+      <p class="mt-2 text-sm text-[color:var(--color-mute)] italic max-w-xs">
+        Ein sanfter Ort für Achtsamkeit, Selbstliebe und den Mut, ganz du selbst zu sein.
+      </p>
+    </div>
+    <div class="text-sm text-[color:var(--color-mute)]">
+      <h4 class="text-[color:var(--color-bark)] font-serif text-lg mb-2">Entdecken</h4>
+      <ul class="space-y-1.5">
+        <li><a href="/" class="hover:text-[color:var(--color-clay)]">Start</a></li>
+        <li><a href="/blog" class="hover:text-[color:var(--color-clay)]">Blog</a></li>
+      </ul>
+    </div>
+    <div class="text-sm text-[color:var(--color-mute)]">
+      <h4 class="text-[color:var(--color-bark)] font-serif text-lg mb-2">Rechtliches</h4>
+      <ul class="space-y-1.5">
+        <li><a href="/impressum" class="hover:text-[color:var(--color-clay)]">Impressum</a></li>
+        <li><a href="/datenschutz" class="hover:text-[color:var(--color-clay)]">Datenschutz</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="border-t border-[color:var(--color-border)]">
+    <div
+      class="mx-auto max-w-6xl px-6 py-5 text-xs text-[color:var(--color-mute)] flex justify-between flex-wrap gap-2"
+    >
+      <span>© {year} Seelenmut · Mit Ruhe gemacht</span>
+      <span class="italic">Du bist genug.</span>
+    </div>
+  </div>
+</footer>

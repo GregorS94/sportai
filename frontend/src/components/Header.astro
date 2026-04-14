@@ -1,0 +1,60 @@
+---
+import { cms, safe, type CmsPage } from "~/lib/cms";
+
+const pages: CmsPage[] = await safe(cms.menuPages(), []);
+const menu = pages.filter((p) => p.show_in_menu);
+const pathname = Astro.url.pathname;
+---
+
+<header class="relative z-20">
+  <div class="mx-auto max-w-6xl px-6 pt-8 pb-6 flex items-center justify-between gap-6 flex-wrap">
+    <a href="/" class="group flex items-baseline gap-2">
+      <span
+        class="font-serif text-3xl font-medium tracking-tight text-[color:var(--color-bark)] group-hover:text-[color:var(--color-clay)] transition"
+        >Seelenmut</span
+      >
+      <span class="hidden sm:inline text-xs italic text-[color:var(--color-mute)]"
+        >finde deinen Mut</span
+      >
+    </a>
+
+    <nav class="flex items-center gap-1 text-sm">
+      <a
+        href="/"
+        class:list={[
+          "px-3 py-2 rounded-full transition",
+          pathname === "/"
+            ? "bg-[color:var(--color-cream-2)] text-[color:var(--color-bark-dark)]"
+            : "text-[color:var(--color-mute)] hover:text-[color:var(--color-bark)]",
+        ]}>Start</a
+      >
+      {
+        menu.map((p) => (
+          <a
+            href={`/${p.slug}`}
+            class:list={[
+              "px-3 py-2 rounded-full transition",
+              pathname === `/${p.slug}`
+                ? "bg-[color:var(--color-cream-2)] text-[color:var(--color-bark-dark)]"
+                : "text-[color:var(--color-mute)] hover:text-[color:var(--color-bark)]",
+            ]}
+          >
+            {p.title}
+          </a>
+        ))
+      }
+      <a
+        href="/blog"
+        class:list={[
+          "px-3 py-2 rounded-full transition",
+          pathname.startsWith("/blog")
+            ? "bg-[color:var(--color-cream-2)] text-[color:var(--color-bark-dark)]"
+            : "text-[color:var(--color-mute)] hover:text-[color:var(--color-bark)]",
+        ]}>Blog</a
+      >
+    </nav>
+  </div>
+  <div class="mx-auto max-w-6xl px-6">
+    <div class="h-px bg-[color:var(--color-border)]"></div>
+  </div>
+</header>
