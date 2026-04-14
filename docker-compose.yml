@@ -10,18 +10,3 @@ services:
       - .:/app
     working_dir: /app
     restart: unless-stopped
-
-  newsletter:
-    build: ./newsletter
-    container_name: newsletter
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./newsletter/data:/app/data
-    # Copy newsletter/.env.example to newsletter/.env to provide SMTP
-    # credentials through environment variables. The file is optional –
-    # settings can also be saved through the UI.
-    env_file:
-      - path: ./newsletter/.env
-        required: false
-    restart: unless-stopped
