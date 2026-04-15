@@ -11,10 +11,10 @@ interface Props {
 
 const siteName = import.meta.env.PUBLIC_SITE_NAME || "Seelenmut";
 const { title, description, image } = Astro.props;
-const fullTitle = title ? `${title} · ${siteName}` : siteName;
+const fullTitle = title ? `${title} — ${siteName}` : siteName;
 const desc =
   description ||
-  "Seelenmut – ein sanfter Ort für Achtsamkeit, Selbstliebe und den Mut, du selbst zu sein.";
+  "Seelenmut begleitet Menschen aus der Essstörung – bindungs- und entwicklungsorientierte Innere Arbeit als Lösungsstrategie.";
 const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).toString();
 ---
 
@@ -24,25 +24,21 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).to
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={desc} />
+    <meta name="theme-color" content="#faf6ef" />
     <link rel="canonical" href={canonical} />
 
-    <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={desc} />
     {image && <meta property="og:image" content={image} />}
-
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={fullTitle} />
-    <meta name="twitter:description" content={desc} />
 
-    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Fraunces (variable serif) · Inter (body) · JetBrains Mono (labels) -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
 
@@ -50,10 +46,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? Astro.url.origin).to
     <title>{fullTitle}</title>
   </head>
   <body class="min-h-screen flex flex-col">
-    <!-- Soft decorative gradient -->
+    <div class="grain-layer" aria-hidden="true"></div>
+    <!-- soft decorative radials -->
     <div
       aria-hidden="true"
-      class="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(1200px_600px_at_80%_-10%,#f4ebdc_0%,transparent_60%),radial-gradient(900px_500px_at_-10%_20%,#f9eee0_0%,transparent_55%)]"
+      class="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(900px_500px_at_85%_-5%,#f2e9d8_0%,transparent_60%),radial-gradient(700px_400px_at_-5%_20%,#f6e7c7_0%,transparent_55%)]"
     >
     </div>
 

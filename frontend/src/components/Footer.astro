@@ -2,89 +2,100 @@
 const year = new Date().getFullYear();
 ---
 
-<footer class="mt-24 border-t border-[color:var(--color-border)] bg-[color:var(--color-cream-2)]/40">
+<footer class="mt-32 border-t border-[color:var(--color-line)]">
   <!-- Crisis resources strip -->
-  <div class="border-b border-[color:var(--color-border)]">
-    <div class="mx-auto max-w-6xl px-6 py-6">
-      <h4 class="font-serif text-lg text-[color:var(--color-bark)]">
-        Wenn es gerade schwer ist
-      </h4>
-      <p class="mt-1 text-sm text-[color:var(--color-mute)]">
-        Du bist nicht allein. Diese Anlaufstellen sind rund um die Uhr erreichbar:
-      </p>
-      <div class="mt-3 grid gap-2 text-sm md:grid-cols-3">
+  <div class="border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-2)]/40">
+    <div class="mx-auto max-w-7xl px-6 lg:px-10 py-8">
+      <div class="flex items-start justify-between flex-wrap gap-4">
+        <div>
+          <span class="eyebrow">Wenn es jetzt schwer ist</span>
+          <h4 class="font-display text-2xl mt-1">Du bist nicht allein.</h4>
+        </div>
+        <a
+          href="/hilfe"
+          class="text-sm underline underline-offset-4 decoration-[color:var(--color-clay)] text-[color:var(--color-ink)] hover:text-[color:var(--color-clay)]"
+        >
+          Alle Hilfsangebote →
+        </a>
+      </div>
+      <div class="mt-5 grid gap-3 text-sm md:grid-cols-3">
         <a
           href="tel:08001110111"
-          class="group rounded-lg border border-[color:var(--color-border)] bg-white/70 px-4 py-3 hover:border-[color:var(--color-clay)] transition"
+          class="group rounded-2xl border border-[color:var(--color-line)] bg-[color:var(--color-bg)]/70 backdrop-blur px-5 py-4 hover:border-[color:var(--color-clay)] transition"
         >
-          <div class="text-[color:var(--color-bark)] font-medium">Telefonseelsorge</div>
-          <div class="text-[color:var(--color-mute)] text-xs">24 h · kostenlos · anonym</div>
-          <div class="mt-1 text-[color:var(--color-clay)] group-hover:underline">
+          <div class="eyebrow" style="color:var(--color-mute)">Telefonseelsorge</div>
+          <div class="mt-1 font-display text-xl text-[color:var(--color-ink)] group-hover:text-[color:var(--color-clay)]">
             0800 111 0 111
           </div>
+          <div class="text-xs text-[color:var(--color-mute)] mt-1">24 h · kostenlos · anonym</div>
         </a>
         <a
           href="tel:0221892031"
-          class="group rounded-lg border border-[color:var(--color-border)] bg-white/70 px-4 py-3 hover:border-[color:var(--color-clay)] transition"
+          class="group rounded-2xl border border-[color:var(--color-line)] bg-[color:var(--color-bg)]/70 backdrop-blur px-5 py-4 hover:border-[color:var(--color-clay)] transition"
         >
-          <div class="text-[color:var(--color-bark)] font-medium">Hilfetelefon Essstörungen</div>
-          <div class="text-[color:var(--color-mute)] text-xs">BZgA · vertraulich</div>
-          <div class="mt-1 text-[color:var(--color-clay)] group-hover:underline">
+          <div class="eyebrow" style="color:var(--color-mute)">Hilfetelefon Essstörungen</div>
+          <div class="mt-1 font-display text-xl text-[color:var(--color-ink)] group-hover:text-[color:var(--color-clay)]">
             0221 892031
           </div>
+          <div class="text-xs text-[color:var(--color-mute)] mt-1">BZgA · vertraulich</div>
         </a>
         <a
-          href="/hilfe"
-          class="group rounded-lg border border-[color:var(--color-border)] bg-white/70 px-4 py-3 hover:border-[color:var(--color-clay)] transition"
+          href="tel:112"
+          class="group rounded-2xl border border-[color:var(--color-clay-soft)] bg-[color:var(--color-butter)]/40 px-5 py-4 hover:border-[color:var(--color-clay)] transition"
         >
-          <div class="text-[color:var(--color-bark)] font-medium">Weitere Anlaufstellen</div>
-          <div class="text-[color:var(--color-mute)] text-xs">Krisendienste, Beratung, Therapie</div>
-          <div class="mt-1 text-[color:var(--color-clay)] group-hover:underline">
-            Zur Übersicht →
+          <div class="eyebrow">Akuter Notfall</div>
+          <div class="mt-1 font-display text-xl text-[color:var(--color-ink)] group-hover:text-[color:var(--color-clay)]">
+            Notruf 112
           </div>
+          <div class="text-xs text-[color:var(--color-mute)] mt-1">24 h · europaweit</div>
         </a>
       </div>
     </div>
   </div>
 
-  <!-- Navigation + brand -->
-  <div class="mx-auto max-w-6xl px-6 py-12 grid gap-8 md:grid-cols-3">
-    <div>
-      <div class="font-serif text-2xl text-[color:var(--color-bark)]">Seelenmut</div>
-      <p class="mt-2 text-sm text-[color:var(--color-mute)] italic max-w-xs">
-        Ein Leben ohne Essstörung ist möglich. Dieser Ort begleitet dich
-        dahin – sanft, ehrlich, Schritt für Schritt.
+  <!-- Brand / navigation columns -->
+  <div class="mx-auto max-w-7xl px-6 lg:px-10 py-14 grid gap-10 md:grid-cols-4">
+    <div class="md:col-span-2">
+      <div class="flex items-center gap-3">
+        <span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-[color:var(--color-clay)] text-[color:var(--color-bg)] font-display text-lg">s</span>
+        <span class="font-display text-2xl">Seelenmut</span>
+      </div>
+      <p class="mt-4 text-[color:var(--color-mute)] max-w-sm text-sm leading-relaxed">
+        Bindungs- und entwicklungsorientierte Innere Arbeit als Lösungsstrategie.
+        Ein Leben ohne Essstörung ist möglich.
       </p>
-    </div>
-    <div class="text-sm text-[color:var(--color-mute)]">
-      <h4 class="text-[color:var(--color-bark)] font-serif text-lg mb-2">Seelenmut</h4>
-      <ul class="space-y-1.5">
-        <li><a href="/" class="hover:text-[color:var(--color-clay)]">Start</a></li>
-        <li><a href="/ueber-mich" class="hover:text-[color:var(--color-clay)]">Über mich</a></li>
-        <li><a href="/coaching" class="hover:text-[color:var(--color-clay)]">Coaching</a></li>
-        <li><a href="/blog" class="hover:text-[color:var(--color-clay)]">Blog</a></li>
-        <li><a href="/kontakt" class="hover:text-[color:var(--color-clay)]">Kontakt</a></li>
-      </ul>
-    </div>
-    <div class="text-sm text-[color:var(--color-mute)]">
-      <h4 class="text-[color:var(--color-bark)] font-serif text-lg mb-2">Rechtliches</h4>
-      <ul class="space-y-1.5">
-        <li><a href="/hilfe" class="hover:text-[color:var(--color-clay)]">Hilfe &amp; Krisen</a></li>
-        <li><a href="/impressum" class="hover:text-[color:var(--color-clay)]">Impressum</a></li>
-        <li><a href="/datenschutz" class="hover:text-[color:var(--color-clay)]">Datenschutz</a></li>
-      </ul>
-      <p class="mt-3 text-xs">
+      <p class="mt-4 text-xs text-[color:var(--color-mute)] max-w-sm">
         Dieses Angebot ersetzt keine medizinische oder therapeutische Behandlung.
       </p>
     </div>
+
+    <div class="text-sm">
+      <div class="eyebrow mb-3">Seelenmut</div>
+      <ul class="space-y-2 text-[color:var(--color-mute)]">
+        <li><a href="/ueber-mich" class="hover:text-[color:var(--color-ink)]">Über mich</a></li>
+        <li><a href="/angebote" class="hover:text-[color:var(--color-ink)]">Angebote</a></li>
+        <li><a href="/free-your-self" class="hover:text-[color:var(--color-ink)]">Free Your Self</a></li>
+        <li><a href="/blog" class="hover:text-[color:var(--color-ink)]">Seelenblog</a></li>
+        <li><a href="/kontakt" class="hover:text-[color:var(--color-ink)]">Kontakt</a></li>
+      </ul>
+    </div>
+
+    <div class="text-sm">
+      <div class="eyebrow mb-3">Rechtliches</div>
+      <ul class="space-y-2 text-[color:var(--color-mute)]">
+        <li><a href="/hilfe" class="hover:text-[color:var(--color-ink)]">Hilfe &amp; Krisen</a></li>
+        <li><a href="/impressum" class="hover:text-[color:var(--color-ink)]">Impressum</a></li>
+        <li><a href="/datenschutz" class="hover:text-[color:var(--color-ink)]">Datenschutz</a></li>
+      </ul>
+    </div>
   </div>
 
-  <div class="border-t border-[color:var(--color-border)]">
+  <div class="border-t border-[color:var(--color-line)]">
     <div
-      class="mx-auto max-w-6xl px-6 py-5 text-xs text-[color:var(--color-mute)] flex justify-between flex-wrap gap-2"
+      class="mx-auto max-w-7xl px-6 lg:px-10 py-5 text-xs text-[color:var(--color-mute)] flex justify-between flex-wrap gap-2"
     >
-      <span>© {year} Seelenmut · Mit Ruhe gemacht</span>
-      <span class="italic">Ein Schritt nach dem anderen.</span>
+      <span>© {year} Seelenmut · Julia</span>
+      <span class="font-mono uppercase tracking-wider">Ein Schritt nach dem anderen</span>
     </div>
   </div>
 </footer>
