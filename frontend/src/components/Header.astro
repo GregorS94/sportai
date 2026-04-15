@@ -1,60 +1,94 @@
 ---
 import { cms, safe, type CmsPage } from "~/lib/cms";
 
-const pages: CmsPage[] = await safe(cms.menuPages(), []);
-const menu = pages.filter((p) => p.show_in_menu);
+// Pages that are always present (shipped in code), plus any
+// CMS pages the editor flagged as "Im Menü anzeigen".
+const staticLinks: { href: string; label: string }[] = [
+  { href: "/ueber-mich", label: "Über mich" },
+  { href: "/coaching", label: "Coaching" },
+  { href: "/blog", label: "Blog" },
+];
+
+const cmsPages: CmsPage[] = await safe(cms.menuPages(), []);
+// Skip any CMS page whose slug collides with a hard-coded link.
+const reserved = new Set([
+  "",
+  "ueber-mich",
+  "coaching",
+  "blog",
+  "kontakt",
+  "hilfe",
+  "impressum",
+  "datenschutz",
+]);
+const extraLinks = cmsPages
+  .filter((p) => p.show_in_menu && !reserved.has(p.slug))
+  .map((p) => ({ href: `/${p.slug}`, label: p.title }));
+
+const links = [...staticLinks, ...extraLinks];
 const pathname = Astro.url.pathname;
+
+const isActive = (href: string) =>
+  href === "/" ? pathname === "/" : pathname.startsWith(href);
 ---
 
 <header class="relative z-20">
-  <div class="mx-auto max-w-6xl px-6 pt-8 pb-6 flex items-center justify-between gap-6 flex-wrap">
-    <a href="/" class="group flex items-baseline gap-2">
+  <div
+    class="mx-auto max-w-6xl px-6 pt-7 pb-5 flex items-center justify-between gap-6 flex-wrap"
+  >
+    <a href="/" class="group flex items-baseline gap-2.5">
       <span
         class="font-serif text-3xl font-medium tracking-tight text-[color:var(--color-bark)] group-hover:text-[color:var(--color-clay)] transition"
         >Seelenmut</span
       >
-      <span class="hidden sm:inline text-xs italic text-[color:var(--color-mute)]"
-        >finde deinen Mut</span
+      <span
+        class="hidden sm:inline text-xs italic text-[color:var(--color-mute)]"
+        >Ein Leben ohne Essstörung ist möglich</span
       >
     </a>
 
-    <nav class="flex items-center gap-1 text-sm">
-      <a
-        href="/"
-        class:list={[
-          "px-3 py-2 rounded-full transition",
-          pathname === "/"
-            ? "bg-[color:var(--color-cream-2)] text-[color:var(--color-bark-dark)]"
-            : "text-[color:var(--color-mute)] hover:text-[color:var(--color-bark)]",
-        ]}>Start</a
-      >
+    <nav class="flex items-center gap-1 text-sm flex-wrap justify-end">
       {
-        menu.map((p) => (
+        links.map((l) => (
           <a
-            href={`/${p.slug}`}
+            href={l.href}
             class:list={[
               "px-3 py-2 rounded-full transition",
-              pathname === `/${p.slug}`
+              isActive(l.href)
                 ? "bg-[color:var(--color-cream-2)] text-[color:var(--color-bark-dark)]"
                 : "text-[color:var(--color-mute)] hover:text-[color:var(--color-bark)]",
             ]}
           >
-            {p.title}
+            {l.label}
           </a>
         ))
       }
       <a
-        href="/blog"
+        href="/kontakt"
         class:list={[
-          "px-3 py-2 rounded-full transition",
-          pathname.startsWith("/blog")
-            ? "bg-[color:var(--color-cream-2)] text-[color:var(--color-bark-dark)]"
-            : "text-[color:var(--color-mute)] hover:text-[color:var(--color-bark)]",
-        ]}>Blog</a
+          "ml-1 px-4 py-2 rounded-full border transition",
+          isActive("/kontakt")
+            ? "bg-[color:var(--color-bark)] text-white border-[color:var(--color-bark)]"
+            : "border-[color:var(--color-border)] text-[color:var(--color-bark)] hover:border-[color:var(--color-clay)] hover:text-[color:var(--color-clay)]",
+        ]}>Kontakt</a
       >
     </nav>
   </div>
-  <div class="mx-auto max-w-6xl px-6">
-    <div class="h-px bg-[color:var(--color-border)]"></div>
+
+  <!-- Quiet crisis helpline strip, always visible -->
+  <div class="bg-[color:var(--color-cream-2)]/60 border-y border-[color:var(--color-border)]">
+    <div
+      class="mx-auto max-w-6xl px-6 py-2 text-[11px] tracking-wide text-[color:var(--color-mute)] flex items-center justify-between flex-wrap gap-2"
+    >
+      <span>
+        Du brauchst jetzt sofort Unterstützung?
+        <a
+          href="/hilfe"
+          class="underline underline-offset-2 decoration-[color:var(--color-clay)] hover:text-[color:var(--color-bark)]"
+          >Hier findest du Akut-Hilfe →</a
+        >
+      </span>
+      <span class="hidden md:inline italic">Du bist nicht allein.</span>
+    </div>
   </div>
 </header>

@@ -3,34 +3,88 @@ const year = new Date().getFullYear();
 ---
 
 <footer class="mt-24 border-t border-[color:var(--color-border)] bg-[color:var(--color-cream-2)]/40">
+  <!-- Crisis resources strip -->
+  <div class="border-b border-[color:var(--color-border)]">
+    <div class="mx-auto max-w-6xl px-6 py-6">
+      <h4 class="font-serif text-lg text-[color:var(--color-bark)]">
+        Wenn es gerade schwer ist
+      </h4>
+      <p class="mt-1 text-sm text-[color:var(--color-mute)]">
+        Du bist nicht allein. Diese Anlaufstellen sind rund um die Uhr erreichbar:
+      </p>
+      <div class="mt-3 grid gap-2 text-sm md:grid-cols-3">
+        <a
+          href="tel:08001110111"
+          class="group rounded-lg border border-[color:var(--color-border)] bg-white/70 px-4 py-3 hover:border-[color:var(--color-clay)] transition"
+        >
+          <div class="text-[color:var(--color-bark)] font-medium">Telefonseelsorge</div>
+          <div class="text-[color:var(--color-mute)] text-xs">24 h · kostenlos · anonym</div>
+          <div class="mt-1 text-[color:var(--color-clay)] group-hover:underline">
+            0800 111 0 111
+          </div>
+        </a>
+        <a
+          href="tel:0221892031"
+          class="group rounded-lg border border-[color:var(--color-border)] bg-white/70 px-4 py-3 hover:border-[color:var(--color-clay)] transition"
+        >
+          <div class="text-[color:var(--color-bark)] font-medium">Hilfetelefon Essstörungen</div>
+          <div class="text-[color:var(--color-mute)] text-xs">BZgA · vertraulich</div>
+          <div class="mt-1 text-[color:var(--color-clay)] group-hover:underline">
+            0221 892031
+          </div>
+        </a>
+        <a
+          href="/hilfe"
+          class="group rounded-lg border border-[color:var(--color-border)] bg-white/70 px-4 py-3 hover:border-[color:var(--color-clay)] transition"
+        >
+          <div class="text-[color:var(--color-bark)] font-medium">Weitere Anlaufstellen</div>
+          <div class="text-[color:var(--color-mute)] text-xs">Krisendienste, Beratung, Therapie</div>
+          <div class="mt-1 text-[color:var(--color-clay)] group-hover:underline">
+            Zur Übersicht →
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation + brand -->
   <div class="mx-auto max-w-6xl px-6 py-12 grid gap-8 md:grid-cols-3">
     <div>
       <div class="font-serif text-2xl text-[color:var(--color-bark)]">Seelenmut</div>
       <p class="mt-2 text-sm text-[color:var(--color-mute)] italic max-w-xs">
-        Ein sanfter Ort für Achtsamkeit, Selbstliebe und den Mut, ganz du selbst zu sein.
+        Ein Leben ohne Essstörung ist möglich. Dieser Ort begleitet dich
+        dahin – sanft, ehrlich, Schritt für Schritt.
       </p>
     </div>
     <div class="text-sm text-[color:var(--color-mute)]">
-      <h4 class="text-[color:var(--color-bark)] font-serif text-lg mb-2">Entdecken</h4>
+      <h4 class="text-[color:var(--color-bark)] font-serif text-lg mb-2">Seelenmut</h4>
       <ul class="space-y-1.5">
         <li><a href="/" class="hover:text-[color:var(--color-clay)]">Start</a></li>
+        <li><a href="/ueber-mich" class="hover:text-[color:var(--color-clay)]">Über mich</a></li>
+        <li><a href="/coaching" class="hover:text-[color:var(--color-clay)]">Coaching</a></li>
         <li><a href="/blog" class="hover:text-[color:var(--color-clay)]">Blog</a></li>
+        <li><a href="/kontakt" class="hover:text-[color:var(--color-clay)]">Kontakt</a></li>
       </ul>
     </div>
     <div class="text-sm text-[color:var(--color-mute)]">
       <h4 class="text-[color:var(--color-bark)] font-serif text-lg mb-2">Rechtliches</h4>
       <ul class="space-y-1.5">
+        <li><a href="/hilfe" class="hover:text-[color:var(--color-clay)]">Hilfe &amp; Krisen</a></li>
         <li><a href="/impressum" class="hover:text-[color:var(--color-clay)]">Impressum</a></li>
         <li><a href="/datenschutz" class="hover:text-[color:var(--color-clay)]">Datenschutz</a></li>
       </ul>
+      <p class="mt-3 text-xs">
+        Dieses Angebot ersetzt keine medizinische oder therapeutische Behandlung.
+      </p>
     </div>
   </div>
+
   <div class="border-t border-[color:var(--color-border)]">
     <div
       class="mx-auto max-w-6xl px-6 py-5 text-xs text-[color:var(--color-mute)] flex justify-between flex-wrap gap-2"
     >
       <span>© {year} Seelenmut · Mit Ruhe gemacht</span>
-      <span class="italic">Du bist genug.</span>
+      <span class="italic">Ein Schritt nach dem anderen.</span>
     </div>
   </div>
 </footer>

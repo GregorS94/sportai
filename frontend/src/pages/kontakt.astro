@@ -1,0 +1,54 @@
+---
+import BaseLayout from "~/layouts/BaseLayout.astro";
+
+const email = "kontakt@seelenmut.net";
+---
+
+<BaseLayout
+  title="Kontakt"
+  description="Schreib mir – unverbindlich, vertraulich, ohne Druck."
+>
+  <article class="mx-auto max-w-2xl px-6 pt-12 pb-20 text-center">
+    <span class="text-xs uppercase tracking-[0.25em] text-[color:var(--color-clay)]">
+      Seelenmut
+    </span>
+    <h1 class="mt-3">Schreib mir.</h1>
+    <p class="mt-5 text-[color:var(--color-mute)] text-lg leading-relaxed">
+      Manchmal ist der erste Schritt ein einziger Satz. Er muss nicht perfekt
+      sein. Er darf tastend sein, leise, unsicher. Ich lese ihn trotzdem.
+    </p>
+
+    <div
+      class="mt-12 rounded-2xl border border-[color:var(--color-border)] bg-white/80 p-10"
+    >
+      <div class="text-2xl text-[color:var(--color-clay)]">❋</div>
+      <p class="mt-3 text-sm uppercase tracking-[0.2em] text-[color:var(--color-mute)]">
+        Per E-Mail
+      </p>
+      <a
+        href={`mailto:${email}`}
+        class="mt-2 block font-serif text-3xl text-[color:var(--color-bark)] hover:text-[color:var(--color-clay)] transition"
+      >
+        {email}
+      </a>
+      <p class="mt-5 text-sm text-[color:var(--color-mute)]">
+        Ich melde mich in der Regel innerhalb weniger Tage zurück.
+      </p>
+      <a
+        href={`mailto:${email}?subject=Kennenlerngespräch`}
+        class="mt-8 inline-flex items-center gap-2 rounded-full bg-[color:var(--color-bark)] text-white px-7 py-3 text-sm font-medium hover:bg-[color:var(--color-bark-dark)] transition"
+      >
+        Kostenloses Kennenlerngespräch anfragen →
+      </a>
+    </div>
+
+    <p class="mt-12 text-sm text-[color:var(--color-mute)] leading-relaxed">
+      Wenn es dir gerade akut nicht gut geht, findest du
+      <a
+        href="/hilfe"
+        class="underline underline-offset-2 decoration-[color:var(--color-clay)] text-[color:var(--color-bark)]"
+        >hier Akut-Hilfe</a
+      > – rund um die Uhr erreichbar.
+    </p>
+  </article>
+</BaseLayout>

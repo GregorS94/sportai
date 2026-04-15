@@ -1,0 +1,171 @@
+---
+import BaseLayout from "~/layouts/BaseLayout.astro";
+
+// Hard-coded so this page can never be accidentally deleted or edited into
+// something harmful via the CMS. All numbers are German public services.
+const hotlines = [
+  {
+    name: "Telefonseelsorge",
+    phone: "0800 111 0 111",
+    href: "tel:08001110111",
+    detail: "24 Stunden · kostenlos · anonym · auch per Chat und Mail",
+    url: "https://www.telefonseelsorge.de",
+  },
+  {
+    name: "Telefonseelsorge (zweite Nummer)",
+    phone: "0800 111 0 222",
+    href: "tel:08001110222",
+    detail: "Alternative Leitung der Telefonseelsorge",
+    url: "https://www.telefonseelsorge.de",
+  },
+  {
+    name: "Hilfetelefon Essstörungen (BZgA)",
+    phone: "0221 892031",
+    href: "tel:0221892031",
+    detail: "Mo–Do 10–22 Uhr, Fr–So 10–18 Uhr · vertraulich",
+    url: "https://www.bzga-essstoerungen.de",
+  },
+  {
+    name: "Nummer gegen Kummer – für Erwachsene",
+    phone: "0800 111 0 550",
+    href: "tel:08001110550",
+    detail: "Mo–Fr 9–11 Uhr, Di + Do 17–19 Uhr",
+    url: "https://www.nummergegenkummer.de",
+  },
+  {
+    name: "Nummer gegen Kummer – für Kinder & Jugendliche",
+    phone: "116 111",
+    href: "tel:116111",
+    detail: "Mo–Sa 14–20 Uhr",
+    url: "https://www.nummergegenkummer.de",
+  },
+];
+
+const resources = [
+  {
+    name: "Bundeszentrale für gesundheitliche Aufklärung – Essstörungen",
+    url: "https://www.bzga-essstoerungen.de",
+    text: "Informationen, Beratung, Adressdatenbank für Therapie und Beratungsstellen in deiner Nähe.",
+  },
+  {
+    name: "ANAD e. V. – Essstörungen verstehen und helfen",
+    url: "https://www.anad.de",
+    text: "Beratungsstelle, betreutes Wohnen, Online-Angebote, Angehörigen-Gruppen.",
+  },
+  {
+    name: "Deutsche Depressionshilfe",
+    url: "https://www.deutsche-depressionshilfe.de",
+    text: "Informationen, Selbsttests, regionale Anlaufstellen.",
+  },
+  {
+    name: "Therapeuten-Suche der Kassenärztlichen Vereinigung",
+    url: "https://www.116117.de/de/psychotherapie.php",
+    text: "Terminservicestelle 116 117 · vermittelt zeitnah einen Termin bei Psychotherapeut:innen.",
+  },
+];
+---
+
+<BaseLayout
+  title="Hilfe & Krisen"
+  description="Anlaufstellen, Hilfetelefone und Beratungsangebote bei Essstörungen und seelischen Notlagen."
+>
+  <article class="mx-auto max-w-3xl px-6 pt-12 pb-20">
+    <header class="text-center">
+      <span class="text-xs uppercase tracking-[0.25em] text-[color:var(--color-clay)]">
+        Seelenmut
+      </span>
+      <h1 class="mt-3">Du bist nicht allein.</h1>
+      <p class="mt-5 text-[color:var(--color-mute)] text-lg">
+        Wenn es dir gerade nicht gut geht, wenn Gedanken kreisen oder alles zu
+        viel wird: Diese Menschen und Stellen sind für dich da.
+      </p>
+    </header>
+
+    <!-- Akute Notfälle -->
+    <div
+      class="mt-10 rounded-2xl border border-[color:var(--color-clay-soft)] bg-[color:var(--color-cream-2)]/60 p-6 md:p-8"
+    >
+      <h2 class="font-serif text-2xl text-[color:var(--color-bark)] m-0">
+        Du bist in akuter Gefahr?
+      </h2>
+      <p class="mt-3 text-[color:var(--color-ink)]">
+        Wenn du dich oder jemand anderen nicht mehr sicher weißt:
+      </p>
+      <p class="mt-4">
+        <a
+          href="tel:112"
+          class="inline-flex items-center gap-3 rounded-full bg-[color:var(--color-bark)] text-white px-7 py-3 font-medium hover:bg-[color:var(--color-bark-dark)] transition"
+        >
+          Notruf 112
+        </a>
+        <span class="ml-3 text-sm text-[color:var(--color-mute)]">
+          rund um die Uhr, europaweit
+        </span>
+      </p>
+      <p class="mt-4 text-sm text-[color:var(--color-mute)]">
+        Oder gehe zur nächsten psychiatrischen Klinik-Ambulanz. Auch dort wird
+        dir zu jeder Tages- und Nachtzeit geholfen.
+      </p>
+    </div>
+
+    <!-- Hotlines -->
+    <section class="mt-14">
+      <h2>Hilfetelefone</h2>
+      <p class="text-[color:var(--color-mute)]">
+        Alle Nummern sind kostenlos, in Deutschland erreichbar und vertraulich.
+      </p>
+      <div class="mt-6 grid gap-3">
+        {
+          hotlines.map((h) => (
+            <a
+              href={h.href}
+              class="group block rounded-xl border border-[color:var(--color-border)] bg-white/80 p-5 hover:border-[color:var(--color-clay)] transition"
+            >
+              <div class="flex items-baseline justify-between flex-wrap gap-2">
+                <div class="font-medium text-[color:var(--color-bark)]">
+                  {h.name}
+                </div>
+                <div class="font-serif text-xl text-[color:var(--color-clay)] group-hover:underline">
+                  {h.phone}
+                </div>
+              </div>
+              <p class="mt-1 text-sm text-[color:var(--color-mute)]">{h.detail}</p>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Weiterführende Hilfe -->
+    <section class="mt-14">
+      <h2>Beratungs- und Informationsstellen</h2>
+      <p class="text-[color:var(--color-mute)]">
+        Professionelle Anlaufstellen für Information, Beratung und
+        Therapievermittlung.
+      </p>
+      <ul class="mt-6 space-y-4 not-prose">
+        {
+          resources.map((r) => (
+            <li class="rounded-xl border border-[color:var(--color-border)] bg-white/80 p-5">
+              <a
+                href={r.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="font-medium text-[color:var(--color-bark)] hover:text-[color:var(--color-clay)]"
+              >
+                {r.name} ↗
+              </a>
+              <p class="mt-1 text-sm text-[color:var(--color-mute)]">{r.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <p class="mt-14 text-center text-sm text-[color:var(--color-mute)] italic">
+      Seelenmut ist ein Begleit- und Bildungsangebot und ersetzt keine
+      medizinische oder therapeutische Behandlung. Bitte zögere nicht, dir
+      zusätzlich professionelle Unterstützung zu holen.
+    </p>
+  </article>
+</BaseLayout>
