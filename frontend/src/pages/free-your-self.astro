@@ -1,0 +1,131 @@
+---
+import BaseLayout from "~/layouts/BaseLayout.astro";
+
+const modules = [
+  {
+    num: "01",
+    title: "Ankommen",
+    text: "Den eigenen Standpunkt finden. Verstehen, wo du stehst – ohne Bewertung.",
+  },
+  {
+    num: "02",
+    title: "Verstehen",
+    text: "Die Muster hinter der Essstörung erkennen. Was dein Körper dir sagen will.",
+  },
+  {
+    num: "03",
+    title: "Fühlen",
+    text: "Emotionen zulassen lernen. Dein Nervensystem als Verbündeten entdecken.",
+  },
+  {
+    num: "04",
+    title: "Lösen",
+    text: "Alte Bindungsmuster erkennen und neue Wege bahnen – Schritt für Schritt.",
+  },
+  {
+    num: "05",
+    title: "Leben",
+    text: "Recovery in den Alltag integrieren. Ein Leben ohne Essstörung leben.",
+  },
+];
+---
+
+<BaseLayout
+  title="Free Your Self"
+  description="Online-Gruppenprogramm für Frauen auf dem Weg aus der Essstörung. Begleitet, strukturiert, gemeinsam."
+>
+  <!-- Hero -->
+  <section class="mx-auto max-w-4xl px-6 lg:px-10 pt-14 pb-20">
+    <header class="text-center max-w-2xl mx-auto">
+      <span class="eyebrow">Gruppenprogramm</span>
+      <h1 class="mt-4">
+        Free Your <span class="display-italic text-[color:var(--color-clay)]">Self.</span>
+      </h1>
+      <p class="mt-6 text-lg text-[color:var(--color-mute)] leading-relaxed">
+        Online-Coaching für Frauen, die bereit sind, anzufangen.
+        In begleiteten Runden – weil der Weg leichter wird, wenn du ihn
+        nicht alleine gehst.
+      </p>
+    </header>
+  </section>
+
+  <!-- What it is -->
+  <section class="bg-[color:var(--color-bg-2)]/50 border-y border-[color:var(--color-line)]">
+    <div class="mx-auto max-w-5xl px-6 lg:px-10 py-20 grid gap-12 lg:grid-cols-2 items-start">
+      <div>
+        <span class="eyebrow">Was ist Free Your Self?</span>
+        <h2 class="mt-4">Ein Weg in<br /><span class="display-italic">Gemeinschaft.</span></h2>
+        <p class="mt-6 text-[color:var(--color-mute)] leading-relaxed">
+          Free Your Self ist ein strukturiertes Online-Gruppenprogramm, das dich über
+          mehrere Wochen begleitet. In einer kleinen, geschützten Gruppe arbeiten wir
+          gemeinsam an den Themen, die hinter der Essstörung liegen.
+        </p>
+      </div>
+      <div class="grid gap-3">
+        {
+          [
+            { label: "Format", value: "Online-Gruppencoaching" },
+            { label: "Gruppengröße", value: "Kleine, geschützte Runde" },
+            { label: "Dauer", value: "Mehrere Wochen, begleitet" },
+            { label: "Für wen", value: "Frauen auf dem Weg aus der Essstörung" },
+          ].map((item) => (
+            <div class="rounded-2xl border border-[color:var(--color-line)] bg-[color:var(--color-bg)]/70 backdrop-blur px-5 py-4">
+              <div class="eyebrow" style="color:var(--color-mute)">{item.label}</div>
+              <div class="mt-1 text-[color:var(--color-ink)]">{item.value}</div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Modules -->
+  <section class="mx-auto max-w-5xl px-6 lg:px-10 py-24">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <span class="eyebrow">Der Weg</span>
+      <h2 class="mt-4">Die Module</h2>
+    </div>
+
+    <div class="grid gap-4">
+      {
+        modules.map((m) => (
+          <article class="rounded-3xl border border-[color:var(--color-line)] bg-[color:var(--color-bg)]/70 backdrop-blur p-8 md:p-10 hover:border-[color:var(--color-ink)] transition">
+            <div class="flex items-baseline justify-between gap-4">
+              <span class="font-mono text-xs tracking-widest text-[color:var(--color-clay)]">
+                {m.num}
+              </span>
+              <span class="h-px flex-1 bg-[color:var(--color-line)]" />
+            </div>
+            <h3 class="mt-4 font-display">{m.title}</h3>
+            <p class="mt-3 text-[color:var(--color-mute)] leading-relaxed max-w-2xl">
+              {m.text}
+            </p>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="mx-auto max-w-5xl px-6 lg:px-10 pb-24">
+    <div class="relative overflow-hidden rounded-3xl bg-[color:var(--color-ink)] text-[color:var(--color-bg)] p-10 md:p-16 text-center">
+      <span class="eyebrow" style="color:var(--color-clay-soft)">Nächste Runde</span>
+      <h2 class="mt-4 font-display text-[color:var(--color-bg)]">
+        Bist du dabei?
+      </h2>
+      <p class="mt-6 max-w-xl mx-auto text-[color:var(--color-bg-2)] leading-relaxed">
+        Schreib mir, wenn du Interesse hast oder Fragen zum Programm hast.
+        Unverbindlich, vertraulich.
+      </p>
+      <a
+        href="/kontakt"
+        class="mt-10 inline-flex items-center gap-2 rounded-full bg-[color:var(--color-clay)] text-[color:var(--color-bg)] px-8 py-4 text-sm font-medium hover:bg-[color:var(--color-clay-hover)] transition"
+      >
+        Jetzt anfragen <span aria-hidden="true">→</span>
+      </a>
+      <span class="absolute -right-16 -bottom-16 font-display italic text-[320px] leading-none text-[color:var(--color-clay)]/15 select-none pointer-events-none">
+        f
+      </span>
+    </div>
+  </section>
+</BaseLayout>

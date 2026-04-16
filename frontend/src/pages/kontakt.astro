@@ -8,26 +8,22 @@ const email = "kontakt@seelenmut.net";
   title="Kontakt"
   description="Schreib mir – unverbindlich, vertraulich, ohne Druck."
 >
-  <article class="mx-auto max-w-2xl px-6 pt-12 pb-20 text-center">
-    <span class="text-xs uppercase tracking-[0.25em] text-[color:var(--color-clay)]">
-      Seelenmut
-    </span>
-    <h1 class="mt-3">Schreib mir.</h1>
-    <p class="mt-5 text-[color:var(--color-mute)] text-lg leading-relaxed">
-      Manchmal ist der erste Schritt ein einziger Satz. Er muss nicht perfekt
-      sein. Er darf tastend sein, leise, unsicher. Ich lese ihn trotzdem.
-    </p>
-
-    <div
-      class="mt-12 rounded-2xl border border-[color:var(--color-border)] bg-white/80 p-10"
-    >
-      <div class="text-2xl text-[color:var(--color-clay)]">❋</div>
-      <p class="mt-3 text-sm uppercase tracking-[0.2em] text-[color:var(--color-mute)]">
-        Per E-Mail
+  <article class="mx-auto max-w-2xl px-6 lg:px-10 pt-14 pb-24">
+    <header class="text-center">
+      <span class="eyebrow">Kontakt</span>
+      <h1 class="mt-4">Schreib mir.</h1>
+      <p class="mt-6 text-lg text-[color:var(--color-mute)] leading-relaxed">
+        Manchmal ist der erste Schritt ein einziger Satz. Er muss nicht perfekt
+        sein. Er darf tastend sein, leise, unsicher. Ich lese ihn trotzdem.
       </p>
+    </header>
+
+    <div class="mt-14 rounded-3xl border border-[color:var(--color-line)] bg-[color:var(--color-bg)]/70 backdrop-blur p-10 text-center">
+      <div class="text-2xl text-[color:var(--color-clay)]">✦</div>
+      <p class="mt-3 eyebrow" style="color:var(--color-mute)">Per E-Mail</p>
       <a
         href={`mailto:${email}`}
-        class="mt-2 block font-serif text-3xl text-[color:var(--color-bark)] hover:text-[color:var(--color-clay)] transition"
+        class="mt-3 block font-display text-3xl text-[color:var(--color-ink)] hover:text-[color:var(--color-clay)] transition"
       >
         {email}
       </a>
@@ -36,19 +32,10 @@ const email = "kontakt@seelenmut.net";
       </p>
       <a
         href={`mailto:${email}?subject=Kennenlerngespräch`}
-        class="mt-8 inline-flex items-center gap-2 rounded-full bg-[color:var(--color-bark)] text-white px-7 py-3 text-sm font-medium hover:bg-[color:var(--color-bark-dark)] transition"
+        class="mt-8 inline-flex items-center gap-2 rounded-full bg-[color:var(--color-ink)] text-[color:var(--color-bg)] px-7 py-3 text-sm font-medium hover:bg-[color:var(--color-clay)] transition"
       >
-        Kostenloses Kennenlerngespräch anfragen →
+        Kostenloses Kennenlerngespräch anfragen <span aria-hidden="true">→</span>
       </a>
     </div>
-
-    <p class="mt-12 text-sm text-[color:var(--color-mute)] leading-relaxed">
-      Wenn es dir gerade akut nicht gut geht, findest du
-      <a
-        href="/hilfe"
-        class="underline underline-offset-2 decoration-[color:var(--color-clay)] text-[color:var(--color-bark)]"
-        >hier Akut-Hilfe</a
-      > – rund um die Uhr erreichbar.
-    </p>
   </article>
 </BaseLayout>

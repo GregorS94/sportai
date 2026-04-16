@@ -16,7 +16,6 @@ const reserved = new Set([
   "free-your-self",
   "blog",
   "kontakt",
-  "hilfe",
   "impressum",
   "datenschutz",
 ]);
@@ -121,20 +120,4 @@ const isActive = (href: string) =>
     </nav>
   </div>
 
-  <!-- Crisis help strip: quiet, always visible -->
-  <div class="border-t border-[color:var(--color-line-soft)] bg-[color:var(--color-bg-2)]/50">
-    <div
-      class="mx-auto max-w-7xl px-6 lg:px-10 py-2 text-[11px] font-mono tracking-wider uppercase text-[color:var(--color-mute)] flex items-center justify-between flex-wrap gap-2"
-    >
-      <span>
-        Du brauchst jetzt Unterstützung?
-        <a
-          href="/hilfe"
-          class="underline underline-offset-[3px] decoration-[color:var(--color-clay)] hover:text-[color:var(--color-ink)]"
-          >Akut-Hilfe →</a
-        >
-      </span>
-      <span class="hidden md:inline">Du bist nicht allein.</span>
-    </div>
-  </div>
 </header>
