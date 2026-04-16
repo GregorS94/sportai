@@ -1,0 +1,221 @@
+---
+import BaseLayout from "~/layouts/BaseLayout.astro";
+
+const workAreas = [
+  {
+    title: "Das heile Wesen und Urvertrauen",
+    text: "Empathisch kehren wir zum allerersten/originalen Teil deines Wesens, Verletzte, gute nur, nach noch gelebten Gefühle und Bedürfnisse, die davor verschüttet/verborgen/verdrängt worden sind. Nur durch den Kontakt mit den inneren Kindern, kann auch Heilung und Genesssung gelingen.",
+  },
+  {
+    title: "Deinen Alltag und Hindernissen",
+    text: "Ich betrachte durch deinen WhatsApp-Kontakt, den mein Team und ich, den Klienten tägden tiefen Einblick &er Finanzen und Wunsche, SOB Hindernisse in deinem Alltag.",
+  },
+  {
+    title: "Selbstregulation und Emotionsmanagement",
+    text: "Kannst du fühlt es in euch manchmal, Rastlos im innern, oder gar komplett zusammen-gezogen.  Die inneren Flut führt zu extremen Reaktionen, wo du dich dann wiederum verurteilst, obwohl dein Nervensystem schlichtweg nur dafür sorgt, dass diese Fähigkeiten niemals die Chance hatten, sich Schritt für Schritt, wie im inneren ein natürlichen Vorgang zu entwickeln.",
+  },
+  {
+    title: "Nervensystem und Körperkompetenz",
+    text: "Mein Herzstück ist die Trauma- und Nervensystemarbeit. Alle Praktiken und Übungen die ich dir anzeige, sind sofort in deinen Körper, Seele und Ich, damit du deinen Spiegel als Freund kannst. Erlebnisgruppen/Expositionsübungen um die köperlichen Grundbedürfnisse des Körpers wieder zu verbinden: damit es sich sicher anfühlt, um die richtigen Signale und Gefühle von deinem Körper und von dir Freund zu haben.",
+  },
+];
+
+const coachingStructure = [
+  {
+    label: "1:1 Coachingstunden",
+    icon: "📋",
+  },
+  {
+    label: "Tägliche Betreuung zu jeder Zeit",
+    icon: "💬",
+  },
+  {
+    label: "Hunger natürliche Liebe",
+    icon: "💗",
+  },
+  {
+    label: "Lebenslauf & Co Paket",
+    icon: "📦",
+  },
+];
+
+const testimonials = [
+  {
+    text: "Julia, ich muss dir schnell kurz was berichten, weil es einfach gerade so eine krasse Erfahrung für mich ist 😍 Ich höre plötzlich Dinge. Also alltägliche Dinge. Das Auto auf der Straße. Meine Schritte, wenn ich über den Teppich laufe. Die Badezimmertür (die ganz schön laut ist, wie ich gerade festgestellt habe 😅). Diese Geräusche habe ich NIE wahrgenommen. Aber seit unserer Session heute Morgen ist eine derartige Ruhe in meinem Kopf... kein Tab mit Hintergrundmusik und auch kein Tab, der irgendwelche Gespräche analysiert. Wow. Das fühlt sich einfach nur toll an 😭🫶",
+  },
+  {
+    text: "Danke dir nochmal sehr für all deine Unterstützung auch jetzt in dieser schweren Zeit die letzten Monate 🙏 du warst einen riesen Stütze für mich, ohne die es sicher nicht so leicht gewesen wäre. Ehrlich gesagt weiß ich nicht mal, ob ich ohne deine ganze gemeinsame Arbeit den Mut gehabt hätte mich zu trennen. Deshalb wirklich vielen Dank von ganzem Herzen 🤎",
+  },
+  {
+    text: "Julia, das ist so Wahnsinn, wenn du mir das erzählt hättest als wir uns kennengelernt haben, hätte meine ganze Gefühlswelt alarm geschlagen, dass man so alleine lässt und jetzt bin ich einfach so zu frieden:)",
+  },
+  {
+    text: "Ich hatte das große Glück, über mehrere Monate an einem 1:1 Coaching bei Julia teilnehmen zu dürfen. Mit ihrer liebevollen und empathischen Art hat sie mich begleitet, unterstützt und in schwierigen Momenten aufgefangen. Besonders war auch die 24/7-Begleitung über WhatsApp, die mir das Gefühl von Sicherheit und Geborgenheit gab. Durch Julias wertschätzende und vertrauensvolle Art konnte ich viele innere Themen auflösen und verletzte Anteile heilen. Dafür bin ich ihr zutiefst dankbar. Ich kann Julia von Herzen weiterempfehlen!",
+  },
+];
+---
+
+<BaseLayout
+  title="1:1 Recovery Begleitung"
+  description="Lerne dich wieder in dir selbst zuhause zu fühlen. Individuelle Begleitung aus der Essstörung."
+>
+  <!-- Hero -->
+  <section class="relative">
+    <div class="mx-auto max-w-7xl px-6 lg:px-10 pt-14 lg:pt-20 pb-20">
+      <div class="grid gap-12 lg:grid-cols-12 lg:gap-10 items-center">
+        <div class="lg:col-span-7">
+          <span class="eyebrow">1:1 Coaching</span>
+          <h1 class="mt-6">
+            Lerne dich wieder in dir selbst<br />
+            <span class="display-italic text-[color:var(--color-clay)]">zuhause zu fühlen.</span>
+          </h1>
+          <p class="mt-8 max-w-xl text-lg text-[color:var(--color-mute)] leading-relaxed">
+            Ich begleite dich persönlich und individuell auf deinem
+            Weg zurück zu dir selbst. Deine Essstörung darf gehen –
+            in deinem Tempo, mit echtem Gegenüber.
+          </p>
+          <div class="mt-10 flex items-center gap-3 flex-wrap">
+            <a
+              href="/kontakt"
+              class="inline-flex items-center gap-2 rounded-full bg-[color:var(--color-ink)] text-[color:var(--color-bg)] px-8 py-4 text-sm font-medium hover:bg-[color:var(--color-clay)] transition"
+            >
+              Kostenloses Kennenlerngespräch <span aria-hidden="true">→</span>
+            </a>
+          </div>
+        </div>
+        <div class="lg:col-span-5">
+          <div class="arch-frame aspect-[4/5] bg-gradient-to-br from-[color:var(--color-bg-3)] via-[color:var(--color-butter)] to-[color:var(--color-clay-soft)] relative">
+            <span class="absolute bottom-4 left-0 right-0 text-center text-[10px] font-mono uppercase tracking-widest text-[color:var(--color-clay)]/70">
+              Portrait · CMS-Medien
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Motto -->
+  <section class="border-y border-[color:var(--color-line)] bg-[color:var(--color-bg-2)]/40">
+    <div class="mx-auto max-w-4xl px-6 lg:px-10 py-20 text-center">
+      <span class="eyebrow">Mein Motto</span>
+      <h2 class="mt-4">
+        Ein Leben ohne Essstörung<br />
+        ist für jeden <span class="display-italic text-[color:var(--color-clay)]">möglich!</span>
+      </h2>
+      <p class="mt-6 text-[color:var(--color-mute)] max-w-2xl mx-auto leading-relaxed">
+        Mir gibt es keine generischen Optionen: 100% Heilung oder gar nichts.
+        Mein absolutes, liebstes Grundsatz, Zielgruppe und menschlichem Verhalten und das,
+        was ich kenne, meiner „Passion Heilung geht es nicht, sie aufsteuren und Kassen Rumd
+        Rinnen. Deshalb fangen wir gleichzeitig Motivierung natürlich ins es derm
+        nicht jahres Mühe gebraucht hat. Ich hatte keinen einzigen verlorenen Tag weder
+        Übergangsphase, ich hatte keine Angst hatte von Lebensmittel."
+      </p>
+      <p class="mt-4 text-sm text-[color:var(--color-mute)] italic">
+        Ich begleite dich als Expertin, aber auch als Mensch. Du kennst jeden Eedgang Essstörung, auch mich
+        allersters soll Beziehung. Mein seinen Jeden Essanfallg könne leicht die inner
+        Stimchen erlebt zu verstehen, sondern dich in die gemäße Ding verzogen, vor die ein geschmeckst.
+      </p>
+    </div>
+  </section>
+
+  <!-- Woran du arbeiten wirst -->
+  <section class="mx-auto max-w-7xl px-6 lg:px-10 py-24 lg:py-32">
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <span class="eyebrow">Gemeinsam arbeiten wir an</span>
+      <h2 class="mt-4">Woran du <span class="display-italic">arbeiten wirst.</span></h2>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-2">
+      {
+        workAreas.map((area) => (
+          <article class="rounded-3xl border border-[color:var(--color-line)] bg-[color:var(--color-bg)]/70 backdrop-blur p-8 md:p-10 hover:border-[color:var(--color-ink)] transition">
+            <h3 class="font-display">{area.title}</h3>
+            <p class="mt-4 text-[color:var(--color-mute)] leading-relaxed">
+              {area.text}
+            </p>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="bg-[color:var(--color-bg-2)]/50 border-y border-[color:var(--color-line)]">
+    <div class="mx-auto max-w-7xl px-6 lg:px-10 py-24">
+      <div class="text-center mb-14">
+        <span class="eyebrow">Erfahrungen</span>
+        <h2 class="mt-4">Das sagen Seelenmut <span class="display-italic">Klienten.</span></h2>
+      </div>
+
+      <div class="grid gap-4 md:grid-cols-2">
+        {
+          testimonials.map((t) => (
+            <article class="rounded-3xl border border-[color:var(--color-line)] bg-[color:var(--color-bg)]/70 backdrop-blur p-8">
+              <div class="text-[color:var(--color-clay)] text-2xl mb-4">„</div>
+              <p class="text-[color:var(--color-ink-2)] leading-relaxed text-sm">
+                {t.text}
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Aufbau des 1:1 Coachings -->
+  <section class="mx-auto max-w-5xl px-6 lg:px-10 py-24 lg:py-32">
+    <div class="text-center max-w-2xl mx-auto mb-6">
+      <span class="eyebrow">Struktur</span>
+      <h2 class="mt-4">Aufbau des 1:1 <span class="display-italic">Coachings.</span></h2>
+    </div>
+    <p class="text-center text-[color:var(--color-mute)] max-w-2xl mx-auto mb-14 leading-relaxed">
+      Ich möchte überzeugen, um dir das Gefühl zu geben, dass es eine Hand ist, die dich hält. Denn das „Problem" hast du
+      wahrscheinlich in deinem Alltag, denn nimm dir alleine rauf. Aus diesem Grund besteht eine solcher Rückhalt sowie
+      WhatsApp-Support, bei dem du dich jederzeit an mich. Lernen wir uns also die Werke, sie und, kommen
+      wir miteinander der Woche.
+    </p>
+
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        coachingStructure.map((item) => (
+          <div class="rounded-3xl bg-[color:var(--color-clay)] text-[color:var(--color-bg)] p-8 text-center hover:bg-[color:var(--color-clay-hover)] transition">
+            <div class="text-3xl mb-4">{item.icon}</div>
+            <p class="font-display text-lg">{item.label}</p>
+          </div>
+        ))
+      }
+    </div>
+
+    <p class="mt-10 text-center text-[color:var(--color-mute)] max-w-2xl mx-auto leading-relaxed">
+      Betrachte DICH als den wichtigsten Menschen in Deinem Leben, soll denn Du ein einziges Ziel verfolgen sollst. Die steht
+      Glück mit Dir und deinem Friede wieder verbinden.
+    </p>
+    <p class="mt-4 text-center text-[color:var(--color-mute)] max-w-2xl mx-auto text-sm">
+      Du bist nicht klein, zu ruhelos und keine Vergangenheit musst beenden verteidigen, sondern dein Leben zu Leben,
+      denn Du dir erlaubst nach dem immer verbient hast.
+    </p>
+  </section>
+
+  <!-- CTA -->
+  <section class="mx-auto max-w-5xl px-6 lg:px-10 pb-24">
+    <div class="relative overflow-hidden rounded-3xl bg-[color:var(--color-ink)] text-[color:var(--color-bg)] p-10 md:p-16 text-center">
+      <span class="eyebrow" style="color:var(--color-clay-soft)">Nächster Schritt</span>
+      <h2 class="mt-4 font-display text-[color:var(--color-bg)]">
+        Bereit für dein Kennenlerngespräch?
+      </h2>
+      <p class="mt-6 max-w-xl mx-auto text-[color:var(--color-bg-2)] leading-relaxed">
+        Unverbindlich, kostenlos, vertraulich. Schreib mir und wir finden heraus,
+        ob die 1:1 Recovery Begleitung zu dir passt.
+      </p>
+      <a
+        href="/kontakt"
+        class="mt-10 inline-flex items-center gap-2 rounded-full bg-[color:var(--color-clay)] text-[color:var(--color-bg)] px-8 py-4 text-sm font-medium hover:bg-[color:var(--color-clay-hover)] transition"
+      >
+        Kostenloses Kennenlerngespräch <span aria-hidden="true">→</span>
+      </a>
+      <span class="absolute -right-16 -bottom-16 font-display italic text-[320px] leading-none text-[color:var(--color-clay)]/15 select-none pointer-events-none">
+        s
+      </span>
+    </div>
+  </section>
+</BaseLayout>
