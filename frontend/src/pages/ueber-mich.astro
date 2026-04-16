@@ -1,11 +1,22 @@
 ---
 import BaseLayout from "~/layouts/BaseLayout.astro";
+import { cms, safe } from "~/lib/cms";
+
+const page = await safe(cms.page("ueber-mich"), null);
+
+const defaults = {
+  title: "Über mich",
+  subtitle: "Diplomierte Lern-Pädagogin, Autorin, Psychologin und Ernährungstrainerin.",
+  description: "Julia – Psychologin, Ernährungstrainerin, Autorin. Mein Weg und meine Arbeit bei Seelenmut.",
+};
+
+const title = page?.title || defaults.title;
+const subtitle = page?.excerpt || defaults.subtitle;
+const desc = page?.meta?.description || defaults.description;
+const hasContent = page?.content_html && page.content_html.trim().length > 0;
 ---
 
-<BaseLayout
-  title="Über mich"
-  description="Julia – Psychologin, Ernährungstrainerin, Autorin. Mein Weg und meine Arbeit bei Seelenmut."
->
+<BaseLayout title={title} description={desc}>
   <article class="mx-auto max-w-4xl px-6 lg:px-10 pt-14 pb-24">
     <header class="text-center max-w-2xl mx-auto">
       <span class="eyebrow">Über mich</span>
@@ -13,7 +24,7 @@ import BaseLayout from "~/layouts/BaseLayout.astro";
         Ich bin <span class="display-italic text-[color:var(--color-clay)]">Julia.</span>
       </h1>
       <p class="mt-6 text-lg text-[color:var(--color-mute)] leading-relaxed">
-        Diplomierte Lern-Pädagogin, Autorin, Psychologin und Ernährungstrainerin.
+        {subtitle}
       </p>
     </header>
 
@@ -29,44 +40,40 @@ import BaseLayout from "~/layouts/BaseLayout.astro";
 
       <!-- Text -->
       <div class="lg:col-span-7">
-        <div class="prose">
-          <p>
-            Ich begleite Menschen aus der Essstörung – ehrlich, zugewandt, mit
-            tiefem Verständnis für den Weg dahinter. Mein Ansatz ist bindungs-
-            und entwicklungsorientiert, weil ich glaube, dass Heilung in
-            Beziehung passiert.
-          </p>
-          <p>
-            Mein eigener Weg hat mich gelehrt, dass Recovery kein gerader Pfad ist.
-            Es gibt Umwege, Rückschritte und Momente, in denen alles stillzustehen
-            scheint. Aber jeder einzelne Schritt zählt.
-          </p>
-
-          <blockquote>
-            Ein Leben ohne Essstörung ist möglich.
-          </blockquote>
-
-          <h2>Meine Qualifikationen</h2>
-          <ul>
-            <li>Diplomierte Lern-Pädagogin</li>
-            <li>Psychologin</li>
-            <li>Ernährungstrainerin</li>
-            <li>Autorin</li>
-          </ul>
-
-          <h2>Mein Ansatz</h2>
-          <p>
-            Ich arbeite bindungsorientiert und entwicklungsorientiert. Das bedeutet:
-            Wir schauen gemeinsam, was unter der Oberfläche liegt – ohne zu urteilen,
-            ohne zu bewerten. Dein Körper ist kein Problem. Er ist Kompass und
-            Verbündeter.
-          </p>
-          <p>
-            In meiner Arbeit verbinde ich psychologisches Wissen mit
-            Körperarbeit und Nervensystem-Regulierung. Jeder Mensch bringt
-            seine eigene Geschichte mit – und genau dort setzen wir an.
-          </p>
-        </div>
+        {hasContent ? (
+          <div class="prose" set:html={page!.content_html} />
+        ) : (
+          <div class="prose">
+            <p>
+              Ich begleite Menschen aus der Essstörung – ehrlich, zugewandt, mit
+              tiefem Verständnis für den Weg dahinter. Mein Ansatz ist bindungs-
+              und entwicklungsorientiert, weil ich glaube, dass Heilung in
+              Beziehung passiert.
+            </p>
+            <p>
+              Mein eigener Weg hat mich gelehrt, dass Recovery kein gerader Pfad ist.
+              Es gibt Umwege, Rückschritte und Momente, in denen alles stillzustehen
+              scheint. Aber jeder einzelne Schritt zählt.
+            </p>
+            <blockquote>
+              Ein Leben ohne Essstörung ist möglich.
+            </blockquote>
+            <h2>Meine Qualifikationen</h2>
+            <ul>
+              <li>Diplomierte Lern-Pädagogin</li>
+              <li>Psychologin</li>
+              <li>Ernährungstrainerin</li>
+              <li>Autorin</li>
+            </ul>
+            <h2>Mein Ansatz</h2>
+            <p>
+              Ich arbeite bindungsorientiert und entwicklungsorientiert. Das bedeutet:
+              Wir schauen gemeinsam, was unter der Oberfläche liegt – ohne zu urteilen,
+              ohne zu bewerten. Dein Körper ist kein Problem. Er ist Kompass und
+              Verbündeter.
+            </p>
+          </div>
+        )}
 
         <div class="mt-12">
           <a

@@ -1,65 +1,39 @@
 ---
 import BaseLayout from "~/layouts/BaseLayout.astro";
+import { cms, safe } from "~/lib/cms";
+
+const page = await safe(cms.page("impressum"), null);
+const hasContent = page?.content_html && page.content_html.trim().length > 0;
+const title = page?.title || "Impressum";
 ---
 
-<BaseLayout
-  title="Impressum"
-  description="Impressum und Angaben gemäß § 5 TMG."
->
+<BaseLayout title={title} description="Impressum und Angaben gemäß § 5 TMG.">
   <article class="mx-auto max-w-2xl px-6 lg:px-10 pt-14 pb-24">
     <header class="text-center">
       <span class="eyebrow">Rechtliches</span>
-      <h1 class="mt-4">Impressum</h1>
+      <h1 class="mt-4">{title}</h1>
     </header>
 
-    <div class="prose mx-auto mt-12">
-      <h2>Angaben gemäß § 5 TMG</h2>
-      <p>
-        Julia [Nachname]<br />
-        Seelenmut<br />
-        [Straße Nr.]<br />
-        [PLZ Ort]<br />
-        Österreich
-      </p>
-
-      <h2>Kontakt</h2>
-      <p>
-        E-Mail: <a href="mailto:kontakt@seelenmut.net">kontakt@seelenmut.net</a>
-      </p>
-
-      <h2>Berufsbezeichnung</h2>
-      <p>
-        Diplomierte Lern-Pädagogin, Psychologin, Ernährungstrainerin
-      </p>
-
-      <h2>Haftungsausschluss</h2>
-      <h3>Haftung für Inhalte</h3>
-      <p>
-        Die Inhalte dieser Seiten wurden mit größter Sorgfalt erstellt.
-        Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte
-        kann jedoch keine Gewähr übernommen werden.
-      </p>
-
-      <h3>Haftung für Links</h3>
-      <p>
-        Diese Website enthält Links zu externen Webseiten Dritter, auf deren
-        Inhalte kein Einfluss besteht. Für die Inhalte der verlinkten Seiten
-        ist stets der jeweilige Anbieter verantwortlich.
-      </p>
-
-      <h2>Urheberrecht</h2>
-      <p>
-        Die durch die Seitenbetreiberin erstellten Inhalte und Werke auf
-        diesen Seiten unterliegen dem Urheberrecht. Die Vervielfältigung,
-        Bearbeitung, Verbreitung und jede Art der Verwertung außerhalb der
-        Grenzen des Urheberrechtes bedürfen der schriftlichen Zustimmung.
-      </p>
-
-      <hr />
-      <p>
-        <em>Bitte ergänze dieses Impressum mit deinen vollständigen Angaben,
-        bevor die Seite öffentlich geht.</em>
-      </p>
-    </div>
+    {hasContent ? (
+      <div class="prose mx-auto mt-12" set:html={page!.content_html} />
+    ) : (
+      <div class="prose mx-auto mt-12">
+        <h2>Angaben gemäß § 5 TMG</h2>
+        <p>Julia [Nachname]<br />Seelenmut<br />[Straße Nr.]<br />[PLZ Ort]<br />Österreich</p>
+        <h2>Kontakt</h2>
+        <p>E-Mail: <a href="mailto:kontakt@seelenmut.net">kontakt@seelenmut.net</a></p>
+        <h2>Berufsbezeichnung</h2>
+        <p>Diplomierte Lern-Pädagogin, Psychologin, Ernährungstrainerin</p>
+        <h2>Haftungsausschluss</h2>
+        <h3>Haftung für Inhalte</h3>
+        <p>Die Inhalte dieser Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte kann jedoch keine Gewähr übernommen werden.</p>
+        <h3>Haftung für Links</h3>
+        <p>Diese Website enthält Links zu externen Webseiten Dritter, auf deren Inhalte kein Einfluss besteht.</p>
+        <h2>Urheberrecht</h2>
+        <p>Die durch die Seitenbetreiberin erstellten Inhalte und Werke unterliegen dem Urheberrecht.</p>
+        <hr />
+        <p><em>Bitte ergänze dieses Impressum mit deinen vollständigen Angaben, bevor die Seite öffentlich geht.</em></p>
+      </div>
+    )}
   </article>
 </BaseLayout>

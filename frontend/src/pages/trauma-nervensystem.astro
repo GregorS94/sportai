@@ -1,25 +1,24 @@
 ---
 import BaseLayout from "~/layouts/BaseLayout.astro";
+import { cms, safe } from "~/lib/cms";
+
+const page = await safe(cms.page("trauma-nervensystem"), null);
+const hasContent = page?.content_html && page.content_html.trim().length > 0;
+
+const defaults = {
+  title: "1:1 Trauma- & Nervensystem-Arbeit",
+  excerpt: "Alte Wunden schließen und dein inneres Kind nach Hause holen.",
+  description: "Körperbasierte, traumasensible Arbeit.",
+};
+
+const title = page?.title || defaults.title;
+const excerpt = page?.excerpt || defaults.excerpt;
+const desc = page?.meta?.description || defaults.description;
 
 const approaches = [
-  {
-    title: "Verständnis von Trauma",
-    text: "Insbesondere Entwicklungstrauma und dessen Wirkung auf Körper und Nervensystem.",
-  },
-  {
-    title: "Wer bin ich nach Trauma",
-    text: "Die eigene Identität jenseits der Verletzungen wiederfinden und stärken.",
-  },
-  {
-    title: "Erlernen von Techniken",
-    text: "Selbstfürsorge sowie Regulation deines Nervensystems – praktisch und alltagstauglich.",
-  },
-];
-
-const practices = [
-  "Praktiken zur Stressreduzierung",
-  "Ressourcenaufbau und Stärkung deiner Resilienz",
-  "Innere Sicherheit in deinem Körper",
+  { title: "Verständnis von Trauma", text: "Insbesondere Entwicklungstrauma und dessen Wirkung auf Körper und Nervensystem." },
+  { title: "Wer bin ich nach Trauma", text: "Die eigene Identität jenseits der Verletzungen wiederfinden und stärken." },
+  { title: "Erlernen von Techniken", text: "Selbstfürsorge sowie Regulation deines Nervensystems – praktisch und alltagstauglich." },
 ];
 
 const signs = [
@@ -34,22 +33,13 @@ const signs = [
 ];
 
 const testimonials = [
-  {
-    text: "Julia, ich muss dir schnell kurz was berichten, weil es einfach gerade so eine krasse Erfahrung für mich ist 😍 Ich höre plötzlich Dinge. Also alltägliche Dinge. Das Auto auf der Straße. Meine Schritte, wenn ich über den Teppich laufe. Die Badezimmertür (die ganz schön laut ist, wie ich gerade festgestellt habe 😅). Diese Geräusche habe ich NIE wahrgenommen. Aber seit unserer Session heute Morgen ist eine derartige Ruhe in meinem Kopf... kein Tab mit Hintergrundmusik und auch kein Tab, der irgendwelche Gespräche analysiert. Wow. Das fühlt sich einfach nur toll an 😭🫶",
-  },
-  {
-    text: "Danke dir nochmal sehr für all deine Unterstützung auch jetzt in dieser schweren Zeit die letzten Monate 🙏 du warst einen riesen Stütze für mich, ohne die es sicher nicht so leicht gewesen wäre. Ehrlich gesagt weiß ich nicht mal, ob ich ohne deine ganze gemeinsame Arbeit den Mut gehabt hätte mich zu trennen. Deshalb wirklich vielen Dank von ganzem Herzen 🤎",
-  },
-  {
-    text: "Ich hatte das große Glück, über mehrere Monate an einem 1:1 Coaching bei Julia teilnehmen zu dürfen. Mit ihrer liebevollen und empathischen Art hat sie mich begleitet, unterstützt und in schwierigen Momenten aufgefangen. Besonders war auch die 24/7-Begleitung über WhatsApp, die mir das Gefühl von Sicherheit und Geborgenheit gab. Durch Julias wertschätzende und vertrauensvolle Art konnte ich viele innere Themen auflösen und verletzte Anteile heilen. Dafür bin ich ihr zutiefst dankbar. Ich kann Julia von Herzen weiterempfehlen!",
-  },
+  "Julia, ich muss dir schnell kurz was berichten, weil es einfach gerade so eine krasse Erfahrung für mich ist. Ich höre plötzlich Dinge. Also alltägliche Dinge. Wow. Das fühlt sich einfach nur toll an.",
+  "Danke dir nochmal sehr für all deine Unterstützung. Du warst eine riesen Stütze für mich. Deshalb wirklich vielen Dank von ganzem Herzen.",
+  "Ich hatte das große Glück, über mehrere Monate an einem 1:1 Coaching bei Julia teilnehmen zu dürfen. Mit ihrer liebevollen und empathischen Art hat sie mich begleitet. Ich kann Julia von Herzen weiterempfehlen!",
 ];
 ---
 
-<BaseLayout
-  title="1:1 Trauma- & Nervensystem-Arbeit"
-  description="Alte Wunden schließen und dein inneres Kind nach Hause holen. Körperbasierte, traumasensible Arbeit."
->
+<BaseLayout title={title} description={desc}>
   <!-- Hero -->
   <section class="relative">
     <div class="mx-auto max-w-7xl px-6 lg:px-10 pt-14 lg:pt-20 pb-20">
@@ -60,122 +50,65 @@ const testimonials = [
             Alte Wunden schließen und dein inneres Kind<br />
             <span class="display-italic text-[color:var(--color-clay)]">nach Hause holen.</span>
           </h1>
-          <p class="mt-8 max-w-xl text-lg text-[color:var(--color-mute)] leading-relaxed">
-            Entwicklungsorientierte Arbeit betrifft uns alle. Trauma
-            muss nicht groß und schlimm sein. Als kleines
-            Kind, reichen kleine Dinge aus, um das
-            Nervensystem überfluten zu lassen.
-          </p>
-          <div class="mt-10 flex items-center gap-3 flex-wrap">
-            <a
-              href="/kontakt"
-              class="inline-flex items-center gap-2 rounded-full bg-[color:var(--color-ink)] text-[color:var(--color-bg)] px-8 py-4 text-sm font-medium hover:bg-[color:var(--color-clay)] transition"
-            >
+          <p class="mt-8 max-w-xl text-lg text-[color:var(--color-mute)] leading-relaxed">{excerpt}</p>
+          <div class="mt-10">
+            <a href="/kontakt" class="inline-flex items-center gap-2 rounded-full bg-[color:var(--color-ink)] text-[color:var(--color-bg)] px-8 py-4 text-sm font-medium hover:bg-[color:var(--color-clay)] transition">
               Kostenloses Kennenlerngespräch <span aria-hidden="true">→</span>
             </a>
           </div>
         </div>
         <div class="lg:col-span-5">
           <div class="arch-frame aspect-[4/5] bg-gradient-to-br from-[color:var(--color-clay-soft)] via-[color:var(--color-butter)] to-[color:var(--color-bg-3)] relative">
-            <span class="absolute bottom-4 left-0 right-0 text-center text-[10px] font-mono uppercase tracking-widest text-[color:var(--color-clay)]/70">
-              Portrait · CMS-Medien
-            </span>
+            <span class="absolute bottom-4 left-0 right-0 text-center text-[10px] font-mono uppercase tracking-widest text-[color:var(--color-clay)]/70">Portrait · CMS-Medien</span>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Warum Nervensystem in Balance -->
+  <!-- Content from CMS -->
   <section class="border-y border-[color:var(--color-line)] bg-[color:var(--color-bg-2)]/40">
-    <div class="mx-auto max-w-5xl px-6 lg:px-10 py-24 grid gap-12 lg:grid-cols-2 items-start">
-      <div>
-        <span class="eyebrow">Verstehen</span>
-        <h2 class="mt-4">
-          Warum ein Nervensystem in Balance dich<br />
-          <span class="display-italic">Frieden fühlen lässt.</span>
-        </h2>
-      </div>
-      <div>
-        <h3 class="font-display text-xl">Fühlst du dich hier angesprochen?</h3>
-        <div class="mt-6 prose">
-          <p>
-            <strong>Kennst du das wirklich noch,</strong> oder schmerzt dein Körper schon
-            länge noch Ruhe? 🥺 Lebst du an den Tagen wo es „dir gut
-            geht" normalerweise über deinen Kapazitäten, kann dein
-            Nervensystem nur von einem Extrem ins andere, nämlich
-            die totale Erschöpfung fallen.
-          </p>
-          <p>
-            Stelle dir einmal vor:<br />
-            Aus dem Gefühl der Rastlosigkeit, egal ständig unter
-            Strom stehen und einem Nervensystem der
-            Überzeugung, dass nur Extreme wie Kampf oder Flucht
-            „klappen".<br />
-            Ist dieser Zustand eingetreten:
-          </p>
-          <p>
-            Du kennst Ruhe, dieses tote Gefühl von „es ist alles gut"
-            🫶 Es gibt nicht keine Gefahr, wenn ich mich ausruhe.
-            Dein Nervensystem ist endlich in Balance, sogar beim
-            Gedanken an Meinungen und den To-Dos, entwickelt
-            kein Druckgefühl mehr.
-          </p>
-        </div>
-        <div class="mt-6 prose">
-          <p>
-            Entdecke in einer körperbasierten und traumasensiblen
-            Arbeit, wie du dich aus den Spiralen der Angst löst und
-            dadurch innere Sicherheit sowie endlose Freiheit in dem
-            Leben spürst.
-          </p>
-          <p>
-            In meiner 1:1 gehen ich zusammen mit meinen Klienten
-            immer wieder auf die Baustellen, die du
-            brauchst, um nachhaltig inneren Frieden herzustellen und
-            diesen auch zu beandern.
-          </p>
+    <div class="mx-auto max-w-3xl px-6 lg:px-10 py-20">
+      {hasContent ? (
+        <div class="prose mx-auto" set:html={page!.content_html} />
+      ) : (
+        <div class="prose mx-auto">
+          <h2>Warum ein Nervensystem in Balance dich Frieden fühlen lässt</h2>
+          <p><strong>Kennst du das wirklich noch,</strong> oder schmerzt dein Körper schon lange nach Ruhe? Dein Nervensystem kann nur von einem Extrem ins andere – nämlich die totale Erschöpfung – fallen.</p>
+          <p>Entdecke in einer körperbasierten und traumasensiblen Arbeit, wie du dich aus den Spiralen der Angst löst und dadurch innere Sicherheit sowie Freiheit spürst.</p>
           <ul>
-            <li>Erlaubnisraum für deinen Körper schaffen. Dein Körper erinnert sich, auch wenn du es vielleicht mit deinem Verstand nicht mehr kannst.</li>
+            <li>Erlaubnisraum für deinen Körper schaffen</li>
             <li>Innere Sicherheit neu verankern</li>
             <li>Aufbau deiner neuen inneren Teamarbeit</li>
           </ul>
         </div>
-      </div>
+      )}
     </div>
   </section>
 
-  <!-- Wie ich traumasensibel arbeite -->
-  <section class="mx-auto max-w-5xl px-6 lg:px-10 py-24 lg:py-32">
+  <!-- Methoden -->
+  <section class="mx-auto max-w-5xl px-6 lg:px-10 py-24">
     <div class="text-center mb-14">
       <span class="eyebrow">Methoden</span>
       <h2 class="mt-4">Wie ich traumasensibel <span class="display-italic">arbeite.</span></h2>
     </div>
-
     <div class="grid gap-6 md:grid-cols-3">
-      {
-        approaches.map((a) => (
-          <article class="rounded-3xl border border-[color:var(--color-line)] bg-[color:var(--color-bg)]/70 backdrop-blur p-8 text-center hover:border-[color:var(--color-ink)] transition">
-            <div class="mx-auto mb-6 h-20 w-20 rounded-full bg-[color:var(--color-butter)] flex items-center justify-center">
-              <span class="text-[color:var(--color-clay)] text-2xl">✦</span>
-            </div>
-            <h3 class="font-display text-lg">{a.title}</h3>
-            <p class="mt-3 text-[color:var(--color-mute)] text-sm leading-relaxed">
-              {a.text}
-            </p>
-          </article>
-        ))
-      }
-    </div>
-
-    <div class="mt-10 grid gap-4 md:grid-cols-3">
-      {
-        practices.map((p) => (
-          <div class="rounded-2xl bg-[color:var(--color-bg-2)] px-6 py-5 text-center">
-            <p class="text-sm text-[color:var(--color-ink-2)] font-medium">{p}</p>
+      {approaches.map((a) => (
+        <article class="rounded-3xl border border-[color:var(--color-line)] bg-[color:var(--color-bg)]/70 backdrop-blur p-8 text-center hover:border-[color:var(--color-ink)] transition">
+          <div class="mx-auto mb-6 h-20 w-20 rounded-full bg-[color:var(--color-butter)] flex items-center justify-center">
+            <span class="text-[color:var(--color-clay)] text-2xl">✦</span>
           </div>
-        ))
-      }
+          <h3 class="font-display text-lg">{a.title}</h3>
+          <p class="mt-3 text-[color:var(--color-mute)] text-sm leading-relaxed">{a.text}</p>
+        </article>
+      ))}
+    </div>
+    <div class="mt-10 grid gap-4 md:grid-cols-3">
+      {["Praktiken zur Stressreduzierung", "Ressourcenaufbau und Stärkung deiner Resilienz", "Innere Sicherheit in deinem Körper"].map((p) => (
+        <div class="rounded-2xl bg-[color:var(--color-bg-2)] px-6 py-5 text-center">
+          <p class="text-sm text-[color:var(--color-ink-2)] font-medium">{p}</p>
+        </div>
+      ))}
     </div>
   </section>
 
@@ -186,43 +119,32 @@ const testimonials = [
         <span class="eyebrow">Erfahrungen</span>
         <h2 class="mt-4">Das sagen Seelenmut <span class="display-italic">Klienten.</span></h2>
       </div>
-
       <div class="grid gap-4 md:grid-cols-3">
-        {
-          testimonials.map((t) => (
-            <article class="rounded-3xl border border-[color:var(--color-line)] bg-[color:var(--color-bg)]/70 backdrop-blur p-8">
-              <div class="text-[color:var(--color-clay)] text-2xl mb-4">„</div>
-              <p class="text-[color:var(--color-ink-2)] leading-relaxed text-sm">
-                {t.text}
-              </p>
-            </article>
-          ))
-        }
+        {testimonials.map((t) => (
+          <article class="rounded-3xl border border-[color:var(--color-line)] bg-[color:var(--color-bg)]/70 backdrop-blur p-8">
+            <div class="text-[color:var(--color-clay)] text-2xl mb-4">„</div>
+            <p class="text-[color:var(--color-ink-2)] leading-relaxed text-sm">{t}</p>
+          </article>
+        ))}
       </div>
     </div>
   </section>
 
-  <!-- Wem eignet sich -->
-  <section class="mx-auto max-w-4xl px-6 lg:px-10 py-24 lg:py-32">
+  <!-- Für wen -->
+  <section class="mx-auto max-w-4xl px-6 lg:px-10 py-24">
     <div class="text-center mb-14">
       <span class="eyebrow">Für wen</span>
-      <h2 class="mt-4">
-        Wem eignet sich die körperbasierte und<br />
-        traumasensible <span class="display-italic">Arbeit?</span>
-      </h2>
+      <h2 class="mt-4">Wem eignet sich die körperbasierte und traumasensible <span class="display-italic">Arbeit?</span></h2>
     </div>
-
     <div class="rounded-3xl border border-[color:var(--color-line)] bg-[color:var(--color-bg)]/70 backdrop-blur p-8 md:p-12">
       <p class="font-display text-xl text-[color:var(--color-clay)] mb-6">Wenn Du...</p>
       <ul class="space-y-4">
-        {
-          signs.map((s) => (
-            <li class="flex items-start gap-4 text-[color:var(--color-ink-2)]">
-              <span class="mt-2 inline-block h-[6px] w-[6px] rounded-full bg-[color:var(--color-clay)] shrink-0" />
-              <span class="leading-relaxed">{s}</span>
-            </li>
-          ))
-        }
+        {signs.map((s) => (
+          <li class="flex items-start gap-4 text-[color:var(--color-ink-2)]">
+            <span class="mt-2 inline-block h-[6px] w-[6px] rounded-full bg-[color:var(--color-clay)] shrink-0" />
+            <span class="leading-relaxed">{s}</span>
+          </li>
+        ))}
       </ul>
     </div>
   </section>
@@ -231,22 +153,12 @@ const testimonials = [
   <section class="mx-auto max-w-5xl px-6 lg:px-10 pb-24">
     <div class="relative overflow-hidden rounded-3xl bg-[color:var(--color-ink)] text-[color:var(--color-bg)] p-10 md:p-16 text-center">
       <span class="eyebrow" style="color:var(--color-clay-soft)">Nächster Schritt</span>
-      <h2 class="mt-4 font-display text-[color:var(--color-bg)]">
-        Bereit für dein Kennenlerngespräch?
-      </h2>
-      <p class="mt-6 max-w-xl mx-auto text-[color:var(--color-bg-2)] leading-relaxed">
-        Unverbindlich, kostenlos, vertraulich. Schreib mir und wir schauen gemeinsam,
-        ob die Trauma- und Nervensystem-Arbeit der richtige Weg für dich ist.
-      </p>
-      <a
-        href="/kontakt"
-        class="mt-10 inline-flex items-center gap-2 rounded-full bg-[color:var(--color-clay)] text-[color:var(--color-bg)] px-8 py-4 text-sm font-medium hover:bg-[color:var(--color-clay-hover)] transition"
-      >
+      <h2 class="mt-4 font-display text-[color:var(--color-bg)]">Bereit für dein Kennenlerngespräch?</h2>
+      <p class="mt-6 max-w-xl mx-auto text-[color:var(--color-bg-2)] leading-relaxed">Unverbindlich, kostenlos, vertraulich.</p>
+      <a href="/kontakt" class="mt-10 inline-flex items-center gap-2 rounded-full bg-[color:var(--color-clay)] text-[color:var(--color-bg)] px-8 py-4 text-sm font-medium hover:bg-[color:var(--color-clay-hover)] transition">
         Kostenloses Kennenlerngespräch <span aria-hidden="true">→</span>
       </a>
-      <span class="absolute -right-16 -bottom-16 font-display italic text-[320px] leading-none text-[color:var(--color-clay)]/15 select-none pointer-events-none">
-        t
-      </span>
+      <span class="absolute -right-16 -bottom-16 font-display italic text-[320px] leading-none text-[color:var(--color-clay)]/15 select-none pointer-events-none">t</span>
     </div>
   </section>
 </BaseLayout>
