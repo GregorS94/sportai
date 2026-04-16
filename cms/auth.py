@@ -3,6 +3,8 @@
 Uses an HMAC-signed cookie holding ``<username>:<issued_ts>``. Credentials are
 read from environment variables so no user table is needed.
 """
+from __future__ import annotations
+
 import hashlib
 import hmac
 import os

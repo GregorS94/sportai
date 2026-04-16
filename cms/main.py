@@ -5,6 +5,8 @@ Provides:
 - Protected admin endpoints for CRUD on the same resources.
 - A tiny HTML admin UI (static files served from ./static).
 """
+from __future__ import annotations
+
 import mimetypes
 import os
 import re
