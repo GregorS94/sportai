@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS pages (
     status TEXT NOT NULL DEFAULT 'draft',
     sort_order INTEGER NOT NULL DEFAULT 0,
     show_in_menu INTEGER NOT NULL DEFAULT 1,
+    blocks TEXT NOT NULL DEFAULT '[]',
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
     published_at TEXT
@@ -80,6 +81,10 @@ def init_db() -> None:
     Path(DB_PATH).parent.mkdir(parents=True, exist_ok=True)
     with sqlite3.connect(DB_PATH) as conn:
         conn.executescript(SCHEMA)
+        # Migration: add blocks column if missing
+        cols = [r[1] for r in conn.execute("PRAGMA table_info(pages)").fetchall()]
+        if "blocks" not in cols:
+            conn.execute("ALTER TABLE pages ADD COLUMN blocks TEXT NOT NULL DEFAULT '[]'")
         conn.commit()
 
 

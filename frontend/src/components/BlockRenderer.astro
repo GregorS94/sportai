@@ -1,0 +1,129 @@
+---
+/**
+ * Renders an array of CMS blocks with the Seelenmut editorial design.
+ * Block types: hero, text, cards, testimonials, cta, image
+ */
+export interface Props {
+  blocks: any[];
+}
+
+const { blocks = [] } = Astro.props;
+---
+
+{blocks.map((block: any) => {
+  if (block.type === "hero") return (
+    <section class="relative">
+      <div class="mx-auto max-w-7xl px-6 lg:px-10 pt-14 lg:pt-20 pb-20">
+        <div class="grid gap-12 lg:grid-cols-12 lg:gap-10 items-center">
+          <div class={block.image ? "lg:col-span-7" : "lg:col-span-10"}>
+            {block.eyebrow && <span class="eyebrow">{block.eyebrow}</span>}
+            {block.title && <h1 class="mt-6"><span class="display-italic text-[color:var(--color-clay)]">{block.title}</span></h1>}
+            {block.subtitle && <p class="mt-8 max-w-xl text-lg text-[color:var(--color-mute)] leading-relaxed">{block.subtitle}</p>}
+            {block.cta_text && block.cta_href && (
+              <div class="mt-10">
+                <a href={block.cta_href} class="inline-flex items-center gap-2 rounded-full bg-[color:var(--color-ink)] text-[color:var(--color-bg)] px-8 py-4 text-sm font-medium hover:bg-[color:var(--color-clay)] transition">
+                  {block.cta_text} <span aria-hidden="true">→</span>
+                </a>
+              </div>
+            )}
+          </div>
+          {block.image && (
+            <div class="lg:col-span-5">
+              <div class="arch-frame aspect-[4/5] overflow-hidden">
+                <img src={block.image} alt="" class="w-full h-full object-cover" />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+
+  if (block.type === "text") return (
+    <section class="mx-auto max-w-3xl px-6 lg:px-10 py-16">
+      <div class="prose mx-auto" set:html={block.content_html || block.content || ""} />
+    </section>
+  );
+
+  if (block.type === "cards") {
+    const items = (block.items || "").split("\n").filter((l: string) => l.trim()).map((line: string) => {
+      const [title, text, href] = line.split("|").map((s: string) => s.trim());
+      return { title, text, href };
+    });
+    return (
+      <section class="mx-auto max-w-5xl px-6 lg:px-10 py-16">
+        {block.eyebrow && <span class="eyebrow">{block.eyebrow}</span>}
+        {block.title && <h2 class="mt-4 mb-10">{block.title}</h2>}
+        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {items.map((item: any) => (
+            <a href={item.href || "#"} class="group rounded-3xl border border-[color:var(--color-line)] bg-[color:var(--color-bg)]/70 backdrop-blur p-8 hover:border-[color:var(--color-ink)] transition block">
+              {item.title && <h3 class="font-display text-lg">{item.title}</h3>}
+              {item.text && <p class="mt-3 text-[color:var(--color-mute)] text-sm leading-relaxed">{item.text}</p>}
+            </a>
+          ))}
+        </div>
+      </section>
+    );
+  }
+
+  if (block.type === "testimonials") {
+    const items = (block.items || "").split("\n\n").filter((t: string) => t.trim());
+    return (
+      <section class="bg-[color:var(--color-bg-2)]/50 border-y border-[color:var(--color-line)]">
+        <div class="mx-auto max-w-7xl px-6 lg:px-10 py-24">
+          {block.title && (
+            <div class="text-center mb-14">
+              <span class="eyebrow">Erfahrungen</span>
+              <h2 class="mt-4">{block.title}</h2>
+            </div>
+          )}
+          <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {items.map((t: string) => (
+              <article class="rounded-3xl border border-[color:var(--color-line)] bg-[color:var(--color-bg)]/70 backdrop-blur p-8">
+                <div class="text-[color:var(--color-clay)] text-2xl mb-4">„</div>
+                <p class="text-[color:var(--color-ink-2)] leading-relaxed text-sm">{t.trim()}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (block.type === "cta") {
+    const isDark = (block.style || "dark") === "dark";
+    return (
+      <section class="mx-auto max-w-5xl px-6 lg:px-10 py-16">
+        <div class:list={[
+          "relative overflow-hidden rounded-3xl p-10 md:p-16 text-center",
+          isDark ? "bg-[color:var(--color-ink)] text-[color:var(--color-bg)]" : "bg-[color:var(--color-bg-2)] border border-[color:var(--color-line)]"
+        ]}>
+          {block.eyebrow && <span class="eyebrow" style={isDark ? "color:var(--color-clay-soft)" : undefined}>{block.eyebrow}</span>}
+          {block.title && <h2 class:list={["mt-4 font-display", isDark ? "text-[color:var(--color-bg)]" : ""]}>{block.title}</h2>}
+          {block.text && <p class:list={["mt-6 max-w-xl mx-auto leading-relaxed", isDark ? "text-[color:var(--color-bg-2)]" : "text-[color:var(--color-mute)]"]}>{block.text}</p>}
+          {block.cta_text && block.cta_href && (
+            <a href={block.cta_href} class:list={[
+              "mt-10 inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-medium transition",
+              isDark ? "bg-[color:var(--color-clay)] text-[color:var(--color-bg)] hover:bg-[color:var(--color-clay-hover)]" : "bg-[color:var(--color-ink)] text-[color:var(--color-bg)] hover:bg-[color:var(--color-clay)]"
+            ]}>
+              {block.cta_text} <span aria-hidden="true">→</span>
+            </a>
+          )}
+        </div>
+      </section>
+    );
+  }
+
+  if (block.type === "image") return (
+    <section class="mx-auto max-w-4xl px-6 lg:px-10 py-16">
+      {block.src && (
+        <figure>
+          <img src={block.src} alt={block.alt || ""} class="w-full rounded-2xl" />
+          {block.caption && <figcaption class="mt-3 text-center text-sm text-[color:var(--color-mute)]">{block.caption}</figcaption>}
+        </figure>
+      )}
+    </section>
+  );
+
+  return null;
+})}

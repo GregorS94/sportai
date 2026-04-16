@@ -173,8 +173,117 @@
 
   $("#btn-new-page").addEventListener("click", () => newPage());
 
+  // ---------- Block Editor ----------
+  state.blocks = [];
+
+  const BLOCK_TYPES = {
+    hero: { label: "Hero", icon: "🏔", fields: [
+      { key: "eyebrow", label: "Eyebrow", type: "text" },
+      { key: "title", label: "Titel", type: "text" },
+      { key: "subtitle", label: "Untertitel", type: "textarea" },
+      { key: "cta_text", label: "Button-Text", type: "text" },
+      { key: "cta_href", label: "Button-Link", type: "text" },
+      { key: "image", label: "Bild-URL", type: "text" },
+    ]},
+    text: { label: "Text", icon: "📝", fields: [
+      { key: "content", label: "Inhalt (Markdown)", type: "textarea-lg" },
+    ]},
+    cards: { label: "Karten", icon: "🃏", fields: [
+      { key: "eyebrow", label: "Eyebrow", type: "text" },
+      { key: "title", label: "Überschrift", type: "text" },
+      { key: "items", label: "Karten (eine pro Zeile: Titel | Text | Link)", type: "textarea-lg" },
+    ]},
+    testimonials: { label: "Testimonials", icon: "💬", fields: [
+      { key: "title", label: "Überschrift", type: "text" },
+      { key: "items", label: "Zitate (eines pro Absatz, Leerzeile trennt)", type: "textarea-lg" },
+    ]},
+    cta: { label: "Call to Action", icon: "📣", fields: [
+      { key: "eyebrow", label: "Eyebrow", type: "text" },
+      { key: "title", label: "Titel", type: "text" },
+      { key: "text", label: "Text", type: "textarea" },
+      { key: "cta_text", label: "Button-Text", type: "text" },
+      { key: "cta_href", label: "Button-Link", type: "text" },
+      { key: "style", label: "Stil (dark / light)", type: "text" },
+    ]},
+    image: { label: "Bild", icon: "🖼", fields: [
+      { key: "src", label: "Bild-URL", type: "text" },
+      { key: "alt", label: "Alt-Text", type: "text" },
+      { key: "caption", label: "Bildunterschrift", type: "text" },
+    ]},
+  };
+
+  function renderBlocks() {
+    const container = $("#blocks-container");
+    if (!state.blocks.length) {
+      container.innerHTML = '<div class="empty-blocks muted">Keine Blöcke. Füge oben einen hinzu oder nutze den Fallback-Markdown.</div>';
+      return;
+    }
+    container.innerHTML = state.blocks.map((block, i) => {
+      const def = BLOCK_TYPES[block.type] || { label: block.type, icon: "?", fields: [] };
+      const fieldsHtml = def.fields.map((f) => {
+        const val = escapeHtml(block[f.key] || "");
+        if (f.type === "textarea-lg") return `<label class="block-field">${f.label}<textarea rows="6" data-block="${i}" data-key="${f.key}">${val}</textarea></label>`;
+        if (f.type === "textarea") return `<label class="block-field">${f.label}<textarea rows="3" data-block="${i}" data-key="${f.key}">${val}</textarea></label>`;
+        return `<label class="block-field">${f.label}<input data-block="${i}" data-key="${f.key}" value="${val}" /></label>`;
+      }).join("");
+      return `
+        <div class="block-card" data-index="${i}">
+          <div class="block-header">
+            <span class="block-type">${def.icon} ${def.label}</span>
+            <div class="block-actions">
+              ${i > 0 ? `<button type="button" class="btn tiny" data-move-block="${i}" data-dir="-1">↑</button>` : ""}
+              ${i < state.blocks.length - 1 ? `<button type="button" class="btn tiny" data-move-block="${i}" data-dir="1">↓</button>` : ""}
+              <button type="button" class="btn tiny danger" data-remove-block="${i}">✕</button>
+            </div>
+          </div>
+          <div class="block-fields">${fieldsHtml}</div>
+        </div>`;
+    }).join("");
+
+    // Bind field changes
+    container.querySelectorAll("[data-block][data-key]").forEach((el) => {
+      el.addEventListener("input", () => {
+        const idx = Number(el.dataset.block);
+        state.blocks[idx][el.dataset.key] = el.value;
+      });
+    });
+    // Bind move
+    container.querySelectorAll("[data-move-block]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const i = Number(btn.dataset.moveBlock);
+        const dir = Number(btn.dataset.dir);
+        const j = i + dir;
+        [state.blocks[i], state.blocks[j]] = [state.blocks[j], state.blocks[i]];
+        renderBlocks();
+      });
+    });
+    // Bind remove
+    container.querySelectorAll("[data-remove-block]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.blocks.splice(Number(btn.dataset.removeBlock), 1);
+        renderBlocks();
+      });
+    });
+  }
+
+  // Add block buttons
+  $$("[data-add-block]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const type = btn.dataset.addBlock;
+      const block = { type };
+      const def = BLOCK_TYPES[type];
+      if (def) def.fields.forEach((f) => { block[f.key] = ""; });
+      state.blocks.push(block);
+      renderBlocks();
+      // Scroll to new block
+      const last = $("#blocks-container").lastElementChild;
+      if (last) last.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  });
+
   function newPage() {
     state.editingPageId = null;
+    state.blocks = [];
     const f = $("#page-form");
     f.reset();
     f.querySelector('[name="status"]').value = "draft";
@@ -182,7 +291,7 @@
     f.querySelector('[name="show_in_menu"]').checked = true;
     $("#page-editor-title").textContent = "Neue Seite";
     $("#page-delete-btn").hidden = true;
-    $("#page-preview").hidden = true;
+    renderBlocks();
     showView("page-editor");
   }
 
@@ -190,6 +299,7 @@
     try {
       const p = await api(`/api/admin/pages/${id}`);
       state.editingPageId = id;
+      state.blocks = Array.isArray(p.blocks) ? p.blocks : [];
       const f = $("#page-form");
       f.title.value = p.title;
       f.slug.value = p.slug;
@@ -202,7 +312,7 @@
       f.meta_description.value = p.meta_description;
       $("#page-editor-title").textContent = `Seite: ${p.title}`;
       $("#page-delete-btn").hidden = false;
-      $("#page-preview").hidden = true;
+      renderBlocks();
       showView("page-editor");
     } catch (e) {
       toast(`Fehler: ${e.message}`, "error");
@@ -222,6 +332,7 @@
       show_in_menu: f.show_in_menu.checked,
       meta_title: f.meta_title.value,
       meta_description: f.meta_description.value,
+      blocks: state.blocks,
     };
     try {
       if (state.editingPageId) {
@@ -245,19 +356,6 @@
       await api(`/api/admin/pages/${state.editingPageId}`, { method: "DELETE" });
       toast("Gelöscht", "success");
       showView("pages");
-    } catch (e) {
-      toast(`Fehler: ${e.message}`, "error");
-    }
-  });
-
-  $("#page-preview-btn").addEventListener("click", async () => {
-    const content = $("#page-form").content.value;
-    try {
-      const res = await api("/api/admin/preview", { method: "POST", body: { content } });
-      const box = $("#page-preview");
-      box.innerHTML = res.html;
-      box.hidden = false;
-      box.scrollIntoView({ behavior: "smooth", block: "nearest" });
     } catch (e) {
       toast(`Fehler: ${e.message}`, "error");
     }

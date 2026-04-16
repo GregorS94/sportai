@@ -66,7 +66,6 @@
     <form id="page-form" class="editor-layout">
       <div class="editor-main">
         <div class="editor-actions">
-          <button type="button" class="btn" id="page-preview-btn">👁 Vorschau</button>
           <button type="submit" class="btn primary">💾 Speichern</button>
           <button type="button" class="btn danger" id="page-delete-btn" hidden>✕ Löschen</button>
         </div>
@@ -76,10 +75,26 @@
         <label>Kurzbeschreibung <span class="muted-label">optional, für Teaser &amp; SEO</span>
           <textarea name="excerpt" rows="2"></textarea>
         </label>
-        <label>Inhalt <span class="muted-label">Markdown</span>
-          <textarea name="content" rows="20"></textarea>
-        </label>
-        <div id="page-preview" class="preview-box" hidden></div>
+
+        <!-- Block Editor -->
+        <div class="block-editor-header">
+          <h3 style="margin:0;">Inhalt (Blöcke)</h3>
+          <div class="block-add-btns">
+            <button type="button" class="btn small" data-add-block="hero">+ Hero</button>
+            <button type="button" class="btn small" data-add-block="text">+ Text</button>
+            <button type="button" class="btn small" data-add-block="cards">+ Karten</button>
+            <button type="button" class="btn small" data-add-block="testimonials">+ Testimonials</button>
+            <button type="button" class="btn small" data-add-block="cta">+ CTA</button>
+            <button type="button" class="btn small" data-add-block="image">+ Bild</button>
+          </div>
+        </div>
+        <div id="blocks-container"></div>
+
+        <!-- Fallback Markdown (shown if no blocks) -->
+        <details class="fallback-md">
+          <summary class="muted-label" style="cursor:pointer;">Fallback-Text (Markdown, nur ohne Blöcke)</summary>
+          <textarea name="content" rows="10" style="margin-top:8px;"></textarea>
+        </details>
       </div>
       <aside class="editor-sidebar">
         <div class="card">

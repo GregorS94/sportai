@@ -207,7 +207,23 @@ def _public_post(row: dict, tags: list[dict]) -> dict:
     }
 
 
+def _parse_blocks(raw: str) -> list:
+    import json as _json
+    try:
+        blocks = _json.loads(raw or "[]")
+        if isinstance(blocks, list):
+            return blocks
+    except Exception:
+        pass
+    return []
+
+
 def _public_page(row: dict) -> dict:
+    blocks = _parse_blocks(row.get("blocks", "[]"))
+    # Render markdown in text blocks
+    for b in blocks:
+        if b.get("type") == "text" and b.get("content"):
+            b["content_html"] = render_markdown(b["content"])
     return {
         "slug": row["slug"],
         "title": row["title"],
@@ -216,6 +232,7 @@ def _public_page(row: dict) -> dict:
         "excerpt": row["excerpt"],
         "show_in_menu": bool(row["show_in_menu"]),
         "sort_order": row["sort_order"],
+        "blocks": blocks,
         "updated_at": row["updated_at"],
         "meta": {
             "title": row["meta_title"] or row["title"],
@@ -350,6 +367,7 @@ class PageIn(BaseModel):
     status: str = "draft"
     sort_order: int = 0
     show_in_menu: bool = True
+    blocks: list = Field(default_factory=list)
 
 
 class PostIn(BaseModel):
@@ -387,7 +405,9 @@ def admin_get_page(pid: int, _: str = Depends(require_admin)):
         row = db.execute("SELECT * FROM pages WHERE id = ?", (pid,)).fetchone()
         if not row:
             raise HTTPException(404)
-        return row_to_dict(row)
+        d = row_to_dict(row)
+        d["blocks"] = _parse_blocks(d.get("blocks", "[]"))
+        return d
 
 
 @app.post("/api/admin/pages")
@@ -396,10 +416,11 @@ def admin_create_page(data: PageIn, _: str = Depends(require_admin)):
     slug = slugify(data.slug or data.title)
     with get_db() as db:
         slug = _ensure_unique_slug(db, "pages", slug)
+        import json as _json
         cur = db.execute(
             "INSERT INTO pages (slug, title, content, excerpt, meta_title, "
-            "meta_description, status, sort_order, show_in_menu, created_at, "
-            "updated_at, published_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+            "meta_description, status, sort_order, show_in_menu, blocks, created_at, "
+            "updated_at, published_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
             (
                 slug,
                 data.title,
@@ -410,6 +431,7 @@ def admin_create_page(data: PageIn, _: str = Depends(require_admin)):
                 data.status,
                 data.sort_order,
                 1 if data.show_in_menu else 0,
+                _json.dumps(data.blocks),
                 now,
                 now,
                 now if data.status == "published" else None,
@@ -431,10 +453,11 @@ def admin_update_page(pid: int, data: PageIn, _: str = Depends(require_admin)):
         published_at = existing["published_at"]
         if data.status == "published" and not published_at:
             published_at = now
+        import json as _json
         db.execute(
             "UPDATE pages SET slug = ?, title = ?, content = ?, excerpt = ?, "
             "meta_title = ?, meta_description = ?, status = ?, sort_order = ?, "
-            "show_in_menu = ?, updated_at = ?, published_at = ? WHERE id = ?",
+            "show_in_menu = ?, blocks = ?, updated_at = ?, published_at = ? WHERE id = ?",
             (
                 slug,
                 data.title,
@@ -445,6 +468,7 @@ def admin_update_page(pid: int, data: PageIn, _: str = Depends(require_admin)):
                 data.status,
                 data.sort_order,
                 1 if data.show_in_menu else 0,
+                _json.dumps(data.blocks),
                 now,
                 published_at,
                 pid,

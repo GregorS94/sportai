@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "~/layouts/BaseLayout.astro";
+import BlockRenderer from "~/components/BlockRenderer.astro";
 import { cms } from "~/lib/cms";
 
 const { slug } = Astro.params;
@@ -11,22 +12,27 @@ try {
 } catch (err) {
   return new Response("Not found", { status: 404 });
 }
+
+const hasBlocks = Array.isArray(page.blocks) && page.blocks.length > 0;
 ---
 
 <BaseLayout title={page.meta.title || page.title} description={page.meta.description || page.excerpt}>
-  <article class="mx-auto max-w-3xl px-6 pt-14 pb-20">
-    <header class="text-center">
-      <span class="text-xs uppercase tracking-[0.25em] text-[color:var(--color-clay)]">
-        Seelenmut
-      </span>
-      <h1 class="mt-3">{page.title}</h1>
-      {page.excerpt && (
-        <p class="mt-5 text-lg text-[color:var(--color-mute)] italic max-w-2xl mx-auto">
-          {page.excerpt}
-        </p>
-      )}
-    </header>
-
-    <div class="prose mx-auto mt-12" set:html={page.content_html} />
-  </article>
+  {hasBlocks ? (
+    <!-- Block-based layout from CMS -->
+    <BlockRenderer blocks={page.blocks} />
+  ) : (
+    <!-- Fallback: Markdown prose -->
+    <article class="mx-auto max-w-3xl px-6 pt-14 pb-20">
+      <header class="text-center">
+        <span class="eyebrow">Seelenmut</span>
+        <h1 class="mt-3">{page.title}</h1>
+        {page.excerpt && (
+          <p class="mt-5 text-lg text-[color:var(--color-mute)] italic max-w-2xl mx-auto">
+            {page.excerpt}
+          </p>
+        )}
+      </header>
+      <div class="prose mx-auto mt-12" set:html={page.content_html} />
+    </article>
+  )}
 </BaseLayout>

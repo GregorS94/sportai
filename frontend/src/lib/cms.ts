@@ -12,6 +12,11 @@ export type CmsMeta = {
   description: string;
 };
 
+export type CmsBlock = {
+  type: string;
+  [key: string]: any;
+};
+
 export type CmsPage = {
   slug: string;
   title: string;
@@ -20,6 +25,7 @@ export type CmsPage = {
   content_html: string;
   show_in_menu: boolean;
   sort_order: number;
+  blocks: CmsBlock[];
   updated_at: string;
   meta: CmsMeta;
 };
