@@ -784,6 +784,34 @@ label input, label select, label textarea { margin-top: 4px; }
   border: 1px solid #ece7df;
 }
 
+/* marquee block */
+.bp-marquee {
+  background: #f4ede3;
+  border-top: 1px solid #ece7df;
+  border-bottom: 1px solid #ece7df;
+  padding: 8px 0;
+  overflow: hidden;
+}
+.bp-marquee-items {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: nowrap;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.bp-marquee-item {
+  font-size: 12px;
+  font-style: italic;
+  color: #3a3834;
+  flex-shrink: 0;
+}
+.bp-marquee-dot {
+  color: #c9936b;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
 /* feature block */
 .bp-feature {
   padding: 14px 18px;

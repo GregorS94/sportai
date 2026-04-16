@@ -114,6 +114,27 @@ const { blocks = [] } = Astro.props;
     );
   }
 
+  if (block.type === "marquee") {
+    const items = (block.items || "").split("|").map((s: string) => s.trim()).filter(Boolean);
+    if (!items.length) return null;
+    return (
+      <div class="border-y border-[color:var(--color-line)] bg-[color:var(--color-bg-2)]/40 overflow-hidden">
+        <div class="flex gap-12 py-4 marquee-track whitespace-nowrap text-[color:var(--color-ink-2)] font-display italic text-xl">
+          {Array.from({ length: 2 }).map(() => (
+            <div class="flex gap-12 shrink-0">
+              {items.map((item: string, i: number) => (
+                <>
+                  <span>{item}</span>
+                  <span class="text-[color:var(--color-clay)]">✦</span>
+                </>
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   if (block.type === "feature") {
     const isDark = (block.style || "dark") === "dark";
     const bullets = (block.bullets || "").split("\n").filter((l: string) => l.trim());

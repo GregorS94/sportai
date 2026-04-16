@@ -5,6 +5,7 @@ Run once to populate the admin panel with editable pages:
 """
 from __future__ import annotations
 
+import json
 import os
 import sys
 from datetime import datetime
@@ -16,7 +17,58 @@ from database import init_db, get_db
 
 NOW = datetime.utcnow().isoformat()
 
+HOME_BLOCKS = json.dumps([
+    {
+        "type": "hero",
+        "eyebrow": "Seelenmut · Julia",
+        "title": "Trauma und Essstörung.",
+        "subtitle": "Bindungs- und entwicklungsorientierte Innere Arbeit als Lösungsstrategie. Ein Leben ohne Essstörung ist möglich.",
+        "cta_text": "Kostenloses Kennenlerngespräch",
+        "cta_href": "/kontakt",
+        "image": "",
+    },
+    {
+        "type": "marquee",
+        "items": "Recovery ist möglich. | Du darfst langsam sein. | Bindung vor Methode. | Der Körper erinnert sich. | Kein Schritt ist zu klein.",
+    },
+    {
+        "type": "cards",
+        "eyebrow": "So kann ich dich begleiten",
+        "title": "Meine Angebote",
+        "items": "1:1 Recovery Begleitung | Ein vertraulicher Raum für deinen Weg – in deinem Tempo. | /recovery-begleitung\n1:1 Trauma- & Nervensystem-Arbeit | Innere Arbeit, die an der Wurzel ansetzt. | /trauma-nervensystem\nFree Your Self | Online-Coaching für Frauen, die bereit sind, anzufangen. | /free-your-self",
+    },
+    {
+        "type": "feature",
+        "eyebrow": "Über mich",
+        "title": "Ich bin Julia.",
+        "text": "Diplomierte Lern-Pädagogin, Autorin, Psychologin und Ernährungstrainerin. Ich begleite Menschen aus der Essstörung – ehrlich, zugewandt, mit tiefem Verständnis für den Weg dahinter.",
+        "bullets": "",
+        "cta_text": "Meine Geschichte →",
+        "cta_href": "/ueber-mich",
+        "style": "light",
+    },
+    {
+        "type": "cta",
+        "eyebrow": "Nächster Schritt",
+        "title": "Magst du schreiben?",
+        "text": "Manchmal ist der erste Schritt ein einziger Satz. Er darf tastend sein, leise, unsicher. Ich lese ihn trotzdem.",
+        "cta_text": "Kostenloses Kennenlerngespräch",
+        "cta_href": "/kontakt",
+        "style": "dark",
+    },
+])
+
 PAGES = [
+    {
+        "slug": "home",
+        "title": "Startseite",
+        "excerpt": "Seelenmut – Julia. Recovery Begleitung, Trauma- & Nervensystem-Arbeit.",
+        "meta_description": "Bindungs- und entwicklungsorientierte Innere Arbeit als Lösungsstrategie. Ein Leben ohne Essstörung ist möglich.",
+        "sort_order": 0,
+        "show_in_menu": 0,
+        "content": "",
+        "blocks": HOME_BLOCKS,
+    },
     {
         "slug": "ueber-mich",
         "title": "Über mich",
@@ -386,15 +438,16 @@ def seed():
                 continue
             db.execute(
                 "INSERT INTO pages (slug, title, content, excerpt, meta_title, "
-                "meta_description, status, sort_order, show_in_menu, created_at, "
-                "updated_at, published_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)",
+                "meta_description, blocks, status, sort_order, show_in_menu, created_at, "
+                "updated_at, published_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (
                     page["slug"],
                     page["title"],
-                    page["content"],
+                    page.get("content", ""),
                     page["excerpt"],
                     page["title"],
                     page["meta_description"],
+                    page.get("blocks", "[]"),
                     "published",
                     page["sort_order"],
                     page["show_in_menu"],

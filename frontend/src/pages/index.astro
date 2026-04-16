@@ -1,14 +1,15 @@
 ---
 import BaseLayout from "~/layouts/BaseLayout.astro";
 import PostCard from "~/components/PostCard.astro";
+import BlockRenderer from "~/components/BlockRenderer.astro";
 import { cms, safe } from "~/lib/cms";
 
-const { items: latestPosts } = await safe(cms.posts({ limit: 4 }), {
-  items: [],
-  total: 0,
-  limit: 4,
-  offset: 0,
-});
+const [{ items: latestPosts }, homePage] = await Promise.all([
+  safe(cms.posts({ limit: 4 }), { items: [], total: 0, limit: 4, offset: 0 }),
+  safe(cms.page("home"), null),
+]);
+
+const hasHomeBlocks = Array.isArray(homePage?.blocks) && homePage!.blocks.length > 0;
 
 // Principles and offerings are placeholders — real copy lives in the CMS
 // (create pages with the matching slugs and the section will read them).
@@ -57,9 +58,29 @@ const offers = [
 ---
 
 <BaseLayout
-  title="Trauma und Essstörung"
-  description="Bindungs- und entwicklungsorientierte Innere Arbeit als Lösungsstrategie. Ein Leben ohne Essstörung ist möglich."
+  title={homePage?.meta?.title || "Trauma und Essstörung"}
+  description={homePage?.meta?.description || "Bindungs- und entwicklungsorientierte Innere Arbeit als Lösungsstrategie. Ein Leben ohne Essstörung ist möglich."}
 >
+  {hasHomeBlocks ? (
+    <>
+      <BlockRenderer blocks={homePage!.blocks} />
+      {latestPosts.length > 0 && (
+        <section class="mx-auto max-w-7xl px-6 lg:px-10 py-24 lg:py-32">
+          <div class="flex items-end justify-between flex-wrap gap-4 mb-12">
+            <div>
+              <span class="eyebrow">Seelenblog</span>
+              <h2 class="mt-3">Zuletzt geschrieben</h2>
+            </div>
+            <a href="/blog" class="text-sm underline underline-offset-4 decoration-[color:var(--color-clay)] hover:text-[color:var(--color-clay)]">Alle Beiträge →</a>
+          </div>
+          <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {latestPosts.slice(0, 3).map((p) => <PostCard post={p} />)}
+          </div>
+        </section>
+      )}
+    </>
+  ) : (
+    <>
   <!-- ========================================================== -->
   <!-- HERO                                                         -->
   <!-- ========================================================== -->
@@ -377,4 +398,6 @@ const offers = [
       </span>
     </div>
   </section>
+    </>
+  )}
 </BaseLayout>

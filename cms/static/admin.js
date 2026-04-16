@@ -205,6 +205,9 @@
       { key: "cta_href", label: "Button-Link", type: "text" },
       { key: "style", label: "Stil (dark / light)", type: "text" },
     ]},
+    marquee: { label: "Marquee", icon: "✦", fields: [
+      { key: "items", label: "Texte (durch | getrennt, z.B. Recovery ist möglich. | Du darfst langsam sein.)", type: "textarea" },
+    ]},
     feature: { label: "Feature", icon: "⭐", fields: [
       { key: "eyebrow", label: "Eyebrow", type: "text" },
       { key: "title", label: "Titel", type: "text" },
@@ -268,6 +271,14 @@
         ${block.title ? `<div class="bp-h2">${e(block.title)}</div>` : '<div class="bp-h2 bp-placeholder">CTA Titel...</div>'}
         ${block.text ? `<div class="bp-sub">${e(block.text)}</div>` : ""}
         ${block.cta_text ? `<span class="bp-btn">${e(block.cta_text)} →</span>` : ""}
+      </div>`;
+    }
+    if (block.type === "marquee") {
+      const items = (block.items || "Recovery ist möglich. | Du darfst langsam sein. | Bindung vor Methode.").split("|").map((s) => s.trim()).filter(Boolean);
+      return `<div class="bp bp-marquee">
+        <div class="bp-marquee-items">
+          ${items.map((t) => `<span class="bp-marquee-item">${e(t)}</span><span class="bp-marquee-dot">✦</span>`).join("")}
+        </div>
       </div>`;
     }
     if (block.type === "feature") {
