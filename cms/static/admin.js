@@ -224,6 +224,83 @@
       { key: "alt", label: "Alt-Text", type: "text" },
       { key: "caption", label: "Bildunterschrift", type: "text" },
     ]},
+    person: { label: "Person", icon: "👤", fields: [
+      { key: "image", label: "Bild-URL", type: "text" },
+      { key: "name", label: "Name", type: "text" },
+      { key: "role", label: "Rolle/Titel", type: "text" },
+      { key: "text", label: "Beschreibung", type: "textarea" },
+      { key: "cta_text", label: "Button-Text", type: "text" },
+      { key: "cta_href", label: "Button-Link", type: "text" },
+    ]},
+    columns: { label: "Zwei-Spalten", icon: "◫", fields: [
+      { key: "layout", label: "Layout (text-image / image-text / text-text)", type: "text" },
+      { key: "left_content", label: "Linke Spalte (Markdown)", type: "textarea-lg" },
+      { key: "right_content", label: "Rechte Spalte (Markdown/Bild-URL)", type: "textarea-lg" },
+    ]},
+    numberedcards: { label: "Nummerierte Karten", icon: "🔢", fields: [
+      { key: "eyebrow", label: "Eyebrow", type: "text" },
+      { key: "title", label: "Überschrift", type: "text" },
+      { key: "subtitle", label: "Untertitel", type: "textarea" },
+      { key: "items", label: "Karten (pro Zeile: Titel | Text)", type: "textarea-lg" },
+    ]},
+    bento: { label: "Bento-Grid", icon: "▦", fields: [
+      { key: "eyebrow", label: "Eyebrow", type: "text" },
+      { key: "title", label: "Überschrift", type: "text" },
+      { key: "link_text", label: "Link-Text (oben rechts)", type: "text" },
+      { key: "link_href", label: "Link-URL", type: "text" },
+      { key: "items", label: "Karten (pro Zeile: Label | Titel | Text | Link | Stil: big/butter/outline)", type: "textarea-lg" },
+    ]},
+    posts: { label: "Blog-Posts", icon: "📰", fields: [
+      { key: "eyebrow", label: "Eyebrow", type: "text" },
+      { key: "title", label: "Überschrift", type: "text" },
+      { key: "count", label: "Anzahl (3, 4 oder 6)", type: "text" },
+      { key: "link_text", label: "Alle-Posts Link-Text", type: "text" },
+      { key: "link_href", label: "Link-URL", type: "text" },
+    ]},
+    video: { label: "Video", icon: "🎬", fields: [
+      { key: "url", label: "Video-URL (YouTube oder Vimeo)", type: "text" },
+      { key: "caption", label: "Bildunterschrift", type: "text" },
+    ]},
+    gallery: { label: "Galerie", icon: "🏞", fields: [
+      { key: "columns", label: "Spalten (2, 3 oder 4)", type: "text" },
+      { key: "images", label: "Bilder (pro Zeile: URL | Alt-Text | Caption)", type: "textarea-lg" },
+    ]},
+    divider: { label: "Trennlinie", icon: "─", fields: [
+      { key: "style", label: "Stil (line / space / dots)", type: "text" },
+      { key: "size", label: "Größe (sm / md / lg)", type: "text" },
+    ]},
+    accordion: { label: "Akkordeon", icon: "▸", fields: [
+      { key: "title", label: "Überschrift", type: "text" },
+      { key: "items", label: "Fragen & Antworten (pro Zeile: Frage | Antwort)", type: "textarea-lg" },
+    ]},
+    stats: { label: "Zahlen", icon: "📊", fields: [
+      { key: "eyebrow", label: "Eyebrow", type: "text" },
+      { key: "items", label: "Zahlen (pro Zeile: Zahl | Beschreibung)", type: "textarea-lg" },
+    ]},
+    pricing: { label: "Preistabelle", icon: "💰", fields: [
+      { key: "eyebrow", label: "Eyebrow", type: "text" },
+      { key: "title", label: "Überschrift", type: "text" },
+      { key: "items", label: "Pakete (pro Zeile: Name | Preis | Features;getrennt | Button-Text | Link)", type: "textarea-lg" },
+    ]},
+    quote: { label: "Zitat", icon: "❝", fields: [
+      { key: "text", label: "Zitat-Text", type: "textarea" },
+      { key: "author", label: "Autor", type: "text" },
+      { key: "role", label: "Rolle/Titel", type: "text" },
+    ]},
+    list: { label: "Liste", icon: "📋", fields: [
+      { key: "title", label: "Überschrift", type: "text" },
+      { key: "style", label: "Stil (check / dot / arrow)", type: "text" },
+      { key: "items", label: "Einträge (einer pro Zeile)", type: "textarea-lg" },
+    ]},
+    callout: { label: "Hinweis", icon: "💡", fields: [
+      { key: "style", label: "Stil (info / warning / tip)", type: "text" },
+      { key: "title", label: "Titel", type: "text" },
+      { key: "text", label: "Text", type: "textarea" },
+    ]},
+    timeline: { label: "Timeline", icon: "📅", fields: [
+      { key: "title", label: "Überschrift", type: "text" },
+      { key: "items", label: "Schritte (pro Zeile: Titel | Text)", type: "textarea-lg" },
+    ]},
   };
 
   function blockPreview(block) {
@@ -298,6 +375,143 @@
       return `<div class="bp bp-image">
         ${block.src ? `<img src="${e(block.src)}" alt="${e(block.alt || "")}" />` : '<div class="bp-placeholder">Bild-URL einfügen...</div>'}
         ${block.caption ? `<div class="bp-caption">${e(block.caption)}</div>` : ""}
+      </div>`;
+    }
+    if (block.type === "person") {
+      return `<div class="bp bp-person">
+        <div class="bp-person-img">${block.image ? `<img src="${e(block.image)}" alt="" />` : '<div class="bp-placeholder">👤</div>'}</div>
+        <div class="bp-person-body">
+          ${block.name ? `<div class="bp-h2">${e(block.name)}</div>` : '<div class="bp-h2 bp-placeholder">Name...</div>'}
+          ${block.role ? `<div class="bp-eyebrow">${e(block.role)}</div>` : ""}
+          ${block.text ? `<div class="bp-sub">${e(block.text).slice(0, 100)}...</div>` : ""}
+          ${block.cta_text ? `<span class="bp-btn">${e(block.cta_text)} →</span>` : ""}
+        </div>
+      </div>`;
+    }
+    if (block.type === "columns") {
+      const layout = block.layout || "text-image";
+      return `<div class="bp bp-columns">
+        <div class="bp-col">${e((block.left_content || "").slice(0, 80)) || '<span class="bp-placeholder">Linke Spalte...</span>'}</div>
+        <div class="bp-col">${layout.includes("image") ? (block.right_content ? `<img src="${e(block.right_content)}" alt="" style="max-height:60px;border-radius:4px;" />` : '<span class="bp-placeholder">Bild/Text...</span>') : (e((block.right_content || "").slice(0, 80)) || '<span class="bp-placeholder">Rechte Spalte...</span>')}</div>
+      </div>`;
+    }
+    if (block.type === "numberedcards") {
+      const items = (block.items || "").split("\n").filter((l) => l.trim()).slice(0, 4);
+      return `<div class="bp bp-numcards">
+        ${block.title ? `<div class="bp-h2">${e(block.title)}</div>` : ""}
+        <div class="bp-numcards-grid">${items.length ? items.map((line, i) => {
+          const [title] = line.split("|");
+          return `<div class="bp-numcard"><span class="bp-numcard-num">${String(i + 1).padStart(2, "0")}</span> ${e((title || "").trim())}</div>`;
+        }).join("") : '<div class="bp-numcard bp-placeholder">Karten hinzufügen...</div>'}</div>
+      </div>`;
+    }
+    if (block.type === "bento") {
+      const items = (block.items || "").split("\n").filter((l) => l.trim()).slice(0, 3);
+      return `<div class="bp bp-bento">
+        ${block.title ? `<div class="bp-h2">${e(block.title)}</div>` : ""}
+        <div class="bp-bento-grid">${items.length ? items.map((line, i) => {
+          const parts = line.split("|").map((s) => s.trim());
+          return `<div class="bp-bento-item ${i === 0 ? 'bp-bento-big' : ''}">${e(parts[1] || parts[0] || "")}</div>`;
+        }).join("") : '<div class="bp-bento-item bp-placeholder">Karten...</div>'}</div>
+      </div>`;
+    }
+    if (block.type === "posts") {
+      return `<div class="bp bp-posts">
+        ${block.eyebrow ? `<div class="bp-eyebrow">${e(block.eyebrow)}</div>` : ""}
+        ${block.title ? `<div class="bp-h2">${e(block.title)}</div>` : '<div class="bp-h2">Blog-Posts</div>'}
+        <div class="bp-posts-grid"><div class="bp-post-ph"></div><div class="bp-post-ph"></div><div class="bp-post-ph"></div></div>
+      </div>`;
+    }
+    if (block.type === "video") {
+      return `<div class="bp bp-video">
+        <div class="bp-video-box">${block.url ? `▶ ${e(block.url)}` : '<span class="bp-placeholder">Video-URL...</span>'}</div>
+        ${block.caption ? `<div class="bp-caption">${e(block.caption)}</div>` : ""}
+      </div>`;
+    }
+    if (block.type === "gallery") {
+      const imgs = (block.images || "").split("\n").filter((l) => l.trim()).slice(0, 6);
+      const cols = Number(block.columns) || 3;
+      return `<div class="bp bp-gallery">
+        <div class="bp-gallery-grid" style="grid-template-columns:repeat(${cols},1fr)">
+          ${imgs.length ? imgs.map((line) => {
+            const [url] = line.split("|");
+            return `<div class="bp-gallery-item">${url ? `<img src="${e(url.trim())}" alt="" />` : ""}</div>`;
+          }).join("") : '<div class="bp-gallery-item bp-placeholder">Bilder...</div>'}
+        </div>
+      </div>`;
+    }
+    if (block.type === "divider") {
+      const sz = block.size || "md";
+      const st = block.style || "line";
+      const h = sz === "sm" ? 16 : sz === "lg" ? 48 : 32;
+      return `<div class="bp bp-divider" style="height:${h}px;display:flex;align-items:center;justify-content:center;">
+        ${st === "line" ? '<div style="width:80%;height:1px;background:#ece7df;"></div>' : st === "dots" ? '<div style="letter-spacing:8px;color:#c9936b;">···</div>' : ""}
+      </div>`;
+    }
+    if (block.type === "accordion") {
+      const items = (block.items || "").split("\n").filter((l) => l.trim()).slice(0, 4);
+      return `<div class="bp bp-accordion">
+        ${block.title ? `<div class="bp-h2">${e(block.title)}</div>` : ""}
+        ${items.length ? items.map((line) => {
+          const [q] = line.split("|");
+          return `<div class="bp-acc-item">▸ ${e((q || "").trim())}</div>`;
+        }).join("") : '<div class="bp-acc-item bp-placeholder">Fragen hinzufügen...</div>'}
+      </div>`;
+    }
+    if (block.type === "stats") {
+      const items = (block.items || "").split("\n").filter((l) => l.trim()).slice(0, 4);
+      return `<div class="bp bp-stats">
+        ${block.eyebrow ? `<div class="bp-eyebrow">${e(block.eyebrow)}</div>` : ""}
+        <div class="bp-stats-grid">${items.length ? items.map((line) => {
+          const [num, label] = line.split("|").map((s) => s.trim());
+          return `<div class="bp-stat"><span class="bp-stat-num">${e(num)}</span><span class="bp-stat-label">${e(label || "")}</span></div>`;
+        }).join("") : '<div class="bp-stat bp-placeholder">Zahlen...</div>'}</div>
+      </div>`;
+    }
+    if (block.type === "pricing") {
+      const items = (block.items || "").split("\n").filter((l) => l.trim()).slice(0, 3);
+      return `<div class="bp bp-pricing">
+        ${block.title ? `<div class="bp-h2">${e(block.title)}</div>` : ""}
+        <div class="bp-pricing-grid">${items.length ? items.map((line) => {
+          const [name, price] = line.split("|").map((s) => s.trim());
+          return `<div class="bp-price-card"><div class="bp-price-name">${e(name)}</div><div class="bp-price-amount">${e(price || "")}</div></div>`;
+        }).join("") : '<div class="bp-price-card bp-placeholder">Pakete...</div>'}</div>
+      </div>`;
+    }
+    if (block.type === "quote") {
+      return `<div class="bp bp-quote">
+        <div class="bp-quote-mark">„</div>
+        <div class="bp-quote-text">${block.text ? e(block.text).slice(0, 120) + "..." : '<span class="bp-placeholder">Zitat...</span>'}</div>
+        ${block.author ? `<div class="bp-quote-author">— ${e(block.author)}${block.role ? `, ${e(block.role)}` : ""}</div>` : ""}
+      </div>`;
+    }
+    if (block.type === "list") {
+      const items = (block.items || "").split("\n").filter((l) => l.trim()).slice(0, 6);
+      const icon = block.style === "arrow" ? "→" : block.style === "dot" ? "•" : "✓";
+      return `<div class="bp bp-list">
+        ${block.title ? `<div class="bp-h2">${e(block.title)}</div>` : ""}
+        ${items.length ? items.map((item) => `<div class="bp-list-item"><span class="bp-list-icon">${icon}</span> ${e(item.trim())}</div>`).join("") : '<div class="bp-list-item bp-placeholder">Einträge...</div>'}
+      </div>`;
+    }
+    if (block.type === "callout") {
+      const st = block.style || "info";
+      const icons = { info: "ℹ️", warning: "⚠️", tip: "💡" };
+      return `<div class="bp bp-callout bp-callout-${st}">
+        <span class="bp-callout-icon">${icons[st] || "ℹ️"}</span>
+        <div>
+          ${block.title ? `<div class="bp-h2">${e(block.title)}</div>` : ""}
+          ${block.text ? `<div class="bp-sub">${e(block.text).slice(0, 100)}</div>` : ""}
+        </div>
+      </div>`;
+    }
+    if (block.type === "timeline") {
+      const items = (block.items || "").split("\n").filter((l) => l.trim()).slice(0, 5);
+      return `<div class="bp bp-timeline">
+        ${block.title ? `<div class="bp-h2">${e(block.title)}</div>` : ""}
+        ${items.length ? items.map((line, i) => {
+          const [title] = line.split("|");
+          return `<div class="bp-tl-item"><span class="bp-tl-dot"></span><span class="bp-tl-text">${e((title || "").trim())}</span></div>`;
+        }).join("") : '<div class="bp-tl-item bp-placeholder">Schritte...</div>'}
       </div>`;
     }
     return `<div class="bp"><span class="bp-placeholder">Block: ${e(block.type)}</span></div>`;
