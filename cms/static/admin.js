@@ -74,6 +74,8 @@
     $$(".nav-btn").forEach((b) => {
       b.classList.toggle("active", b.dataset.view === name);
     });
+    // page builder takes full width — hide sidebar padding
+    document.querySelector(".content").classList.toggle("pb-active", name === "page-editor");
     if (name === "dashboard") loadDashboard();
     if (name === "pages") loadPages();
     if (name === "posts") loadPosts();
@@ -316,13 +318,12 @@
         return `<label class="block-field">${f.label}<input data-block="${i}" data-key="${f.key}" value="${val}" /></label>`;
       }).join("");
       return `
-        <div class="block-card" data-index="${i}">
+        <div class="block-card" data-index="${i}" draggable="true">
           <div class="block-header">
+            <span class="block-drag-handle" title="Ziehen zum Verschieben">⠿</span>
             <span class="block-type">${def.icon} ${def.label}</span>
             <div class="block-actions">
               <button type="button" class="btn tiny" data-toggle-block="${i}">✏️</button>
-              ${i > 0 ? `<button type="button" class="btn tiny" data-move-block="${i}" data-dir="-1">↑</button>` : ""}
-              ${i < state.blocks.length - 1 ? `<button type="button" class="btn tiny" data-move-block="${i}" data-dir="1">↓</button>` : ""}
               <button type="button" class="btn tiny danger" data-remove-block="${i}">✕</button>
             </div>
           </div>
@@ -351,19 +352,8 @@
           fields.hidden = isEditing;
           preview.hidden = !isEditing;
           btn.textContent = isEditing ? "✏️" : "👁";
-          // Refresh preview when switching back
           if (isEditing) preview.innerHTML = blockPreview(state.blocks[Number(i)]);
         }
-      });
-    });
-    // Bind move
-    container.querySelectorAll("[data-move-block]").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const i = Number(btn.dataset.moveBlock);
-        const dir = Number(btn.dataset.dir);
-        const j = i + dir;
-        [state.blocks[i], state.blocks[j]] = [state.blocks[j], state.blocks[i]];
-        renderBlocks();
       });
     });
     // Bind remove
@@ -373,33 +363,153 @@
         renderBlocks();
       });
     });
+    // Drag-and-drop reordering
+    let dragSrc = null;
+    container.querySelectorAll(".block-card").forEach((card) => {
+      card.addEventListener("dragstart", (ev) => {
+        dragSrc = Number(card.dataset.index);
+        ev.dataTransfer.effectAllowed = "move";
+        card.classList.add("dragging");
+      });
+      card.addEventListener("dragend", () => {
+        card.classList.remove("dragging");
+        container.querySelectorAll(".block-card").forEach((c) => c.classList.remove("drag-over"));
+      });
+      card.addEventListener("dragover", (ev) => {
+        ev.preventDefault();
+        ev.dataTransfer.dropEffect = "move";
+        container.querySelectorAll(".block-card").forEach((c) => c.classList.remove("drag-over"));
+        card.classList.add("drag-over");
+      });
+      card.addEventListener("drop", (ev) => {
+        ev.preventDefault();
+        const target = Number(card.dataset.index);
+        if (dragSrc === null || dragSrc === target) return;
+        const moved = state.blocks.splice(dragSrc, 1)[0];
+        state.blocks.splice(target, 0, moved);
+        dragSrc = null;
+        renderBlocks();
+      });
+    });
   }
 
-  // Add block buttons
-  $$("[data-add-block]").forEach((btn) => {
+  // Add block buttons (delegated — handles dynamically rendered buttons too)
+  document.addEventListener("click", (ev) => {
+    const btn = ev.target.closest("[data-add-block]");
+    if (!btn) return;
+    const type = btn.dataset.addBlock;
+    const block = { type };
+    const def = BLOCK_TYPES[type];
+    if (def) def.fields.forEach((f) => { block[f.key] = ""; });
+    state.blocks.push(block);
+    renderBlocks();
+    const last = $("#blocks-container").lastElementChild;
+    if (last) last.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    // auto-open edit mode for new block
+    const idx = state.blocks.length - 1;
+    const fields = document.querySelector(`[data-fields="${idx}"]`);
+    const preview = document.querySelector(`[data-preview="${idx}"]`);
+    const toggleBtn = document.querySelector(`[data-toggle-block="${idx}"]`);
+    if (fields && preview) {
+      fields.hidden = false;
+      preview.hidden = true;
+      if (toggleBtn) toggleBtn.textContent = "👁";
+    }
+  });
+
+  // ---------- Page Builder helpers ----------
+  const pbState = {
+    title: "", slug: "", excerpt: "", content: "",
+    status: "published", sort_order: 0, show_in_menu: true,
+    meta_title: "", meta_description: "",
+  };
+
+  function pbLoadSettings(p) {
+    pbState.title = p.title || "";
+    pbState.slug = p.slug || "";
+    pbState.excerpt = p.excerpt || "";
+    pbState.content = p.content || "";
+    pbState.status = p.status || "published";
+    pbState.sort_order = p.sort_order || 0;
+    pbState.show_in_menu = !!p.show_in_menu;
+    pbState.meta_title = p.meta_title || "";
+    pbState.meta_description = p.meta_description || "";
+    // sync settings drawer
+    $("#ps-title").value = pbState.title;
+    $("#ps-slug").value = pbState.slug;
+    $("#ps-excerpt").value = pbState.excerpt;
+    $("#ps-sort-order").value = pbState.sort_order;
+    $("#ps-show-in-menu").checked = pbState.show_in_menu;
+    $("#ps-meta-title").value = pbState.meta_title;
+    $("#ps-meta_description") && ($("#ps-meta-description").value = pbState.meta_description);
+  }
+
+  function pbReadSettings() {
+    pbState.title = $("#ps-title").value.trim();
+    pbState.slug = $("#ps-slug").value.trim();
+    pbState.excerpt = $("#ps-excerpt").value.trim();
+    pbState.sort_order = Number($("#ps-sort-order").value) || 0;
+    pbState.show_in_menu = $("#ps-show-in-menu").checked;
+    pbState.meta_title = $("#ps-meta-title").value.trim();
+    pbState.meta_description = $("#ps-meta-description").value.trim();
+  }
+
+  function pbRefreshPreview() {
+    const base = (localStorage.getItem("pb_preview_url") || "http://localhost:4321").replace(/\/$/, "");
+    const slug = pbState.slug;
+    if (!slug) return;
+    const url = slug === "home" ? base + "/" : base + "/" + slug;
+    const iframe = $("#pb-iframe");
+    if (iframe.src === url) {
+      iframe.contentWindow && iframe.contentWindow.location.reload();
+    } else {
+      iframe.src = url;
+    }
+  }
+
+  // Preview URL input
+  const pbUrlInput = $("#pb-url-input");
+  pbUrlInput.value = localStorage.getItem("pb_preview_url") || "http://localhost:4321";
+  pbUrlInput.addEventListener("change", () => {
+    localStorage.setItem("pb_preview_url", pbUrlInput.value.trim());
+    pbRefreshPreview();
+  });
+
+  // Device buttons
+  $$(".pb-device-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const type = btn.dataset.addBlock;
-      const block = { type };
-      const def = BLOCK_TYPES[type];
-      if (def) def.fields.forEach((f) => { block[f.key] = ""; });
-      state.blocks.push(block);
-      renderBlocks();
-      // Scroll to new block
-      const last = $("#blocks-container").lastElementChild;
-      if (last) last.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      $$(".pb-device-btn").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      const wrap = $("#pb-iframe-wrap");
+      wrap.dataset.device = btn.dataset.device;
     });
+  });
+
+  // Settings drawer
+  $("#pb-settings-btn").addEventListener("click", () => {
+    pbLoadSettings(pbState);
+    $("#pb-settings-overlay").hidden = false;
+  });
+  $("#pb-settings-close").addEventListener("click", () => {
+    pbReadSettings();
+    $("#page-editor-title").textContent = pbState.title || "Neue Seite";
+    $("#pb-settings-overlay").hidden = true;
+  });
+
+  // Vorschau button
+  $("#pb-preview-btn").addEventListener("click", () => {
+    const base = (localStorage.getItem("pb_preview_url") || "http://localhost:4321").replace(/\/$/, "");
+    const url = pbState.slug === "home" ? base + "/" : base + "/" + pbState.slug;
+    window.open(url, "_blank");
   });
 
   function newPage() {
     state.editingPageId = null;
     state.blocks = [];
-    const f = $("#page-form");
-    f.reset();
-    f.querySelector('[name="status"]').value = "draft";
-    f.querySelector('[name="sort_order"]').value = "0";
-    f.querySelector('[name="show_in_menu"]').checked = true;
+    pbLoadSettings({ title: "", slug: "", excerpt: "", content: "", status: "published", sort_order: 0, show_in_menu: true, meta_title: "", meta_description: "" });
     $("#page-editor-title").textContent = "Neue Seite";
     $("#page-delete-btn").hidden = true;
+    $("#pb-iframe").src = "about:blank";
     renderBlocks();
     showView("page-editor");
   }
@@ -409,20 +519,13 @@
       const p = await api(`/api/admin/pages/${id}`);
       state.editingPageId = id;
       state.blocks = Array.isArray(p.blocks) ? p.blocks : [];
-      const f = $("#page-form");
-      f.title.value = p.title;
-      f.slug.value = p.slug;
-      f.content.value = p.content;
-      f.excerpt.value = p.excerpt;
-      f.status.value = p.status;
-      f.sort_order.value = p.sort_order;
-      f.show_in_menu.checked = !!p.show_in_menu;
-      f.meta_title.value = p.meta_title;
-      f.meta_description.value = p.meta_description;
-      $("#page-editor-title").textContent = `Seite: ${p.title}`;
+      pbLoadSettings(p);
+      $("#page-editor-title").textContent = p.title;
       $("#page-delete-btn").hidden = false;
       renderBlocks();
       showView("page-editor");
+      // load preview
+      setTimeout(pbRefreshPreview, 200);
     } catch (e) {
       toast(`Fehler: ${e.message}`, "error");
     }
@@ -430,29 +533,32 @@
 
   $("#page-form").addEventListener("submit", async (e) => {
     e.preventDefault();
-    const f = e.target;
+    pbReadSettings();
     const data = {
-      title: f.title.value.trim(),
-      slug: f.slug.value.trim(),
-      content: f.content.value,
-      excerpt: f.excerpt.value,
-      status: f.status.value,
-      sort_order: Number(f.sort_order.value) || 0,
-      show_in_menu: f.show_in_menu.checked,
-      meta_title: f.meta_title.value,
-      meta_description: f.meta_description.value,
+      title: pbState.title,
+      slug: pbState.slug,
+      content: pbState.content,
+      excerpt: pbState.excerpt,
+      status: pbState.status,
+      sort_order: pbState.sort_order,
+      show_in_menu: pbState.show_in_menu,
+      meta_title: pbState.meta_title,
+      meta_description: pbState.meta_description,
       blocks: state.blocks,
     };
     try {
       if (state.editingPageId) {
         await api(`/api/admin/pages/${state.editingPageId}`, { method: "PUT", body: data });
-        toast("Seite gespeichert", "success");
+        toast("Gespeichert ✓", "success");
       } else {
         const res = await api("/api/admin/pages", { method: "POST", body: data });
         state.editingPageId = res.id;
+        pbState.slug = res.slug || pbState.slug;
         $("#page-delete-btn").hidden = false;
         toast("Seite angelegt", "success");
       }
+      // refresh preview after save
+      setTimeout(pbRefreshPreview, 400);
     } catch (err) {
       toast(`Fehler: ${err.message}`, "error");
     }

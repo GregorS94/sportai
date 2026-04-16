@@ -57,79 +57,103 @@
     <div id="pages-list"></div>
   </section>
 
-  <!-- ---------------- Page editor ---------------- -->
-  <section class="view" id="view-page-editor" hidden>
-    <div class="page-header">
-      <h2 id="page-editor-title">Seite bearbeiten</h2>
-      <button class="btn" data-back="pages">← Zurück</button>
-    </div>
-    <form id="page-form" class="editor-layout">
-      <div class="editor-main">
-        <div class="editor-actions">
-          <button type="submit" class="btn primary">💾 Speichern</button>
-          <button type="button" class="btn danger" id="page-delete-btn" hidden>✕ Löschen</button>
-        </div>
-        <label>Titel
-          <input name="title" required />
-        </label>
-        <label>Kurzbeschreibung <span class="muted-label">optional, für Teaser &amp; SEO</span>
-          <textarea name="excerpt" rows="2"></textarea>
-        </label>
-
-        <!-- Block Editor -->
-        <div class="block-editor-header">
-          <h3 style="margin:0;">Inhalt (Blöcke)</h3>
-          <div class="block-add-btns">
-            <button type="button" class="btn small" data-add-block="hero">+ Hero</button>
-            <button type="button" class="btn small" data-add-block="text">+ Text</button>
-            <button type="button" class="btn small" data-add-block="cards">+ Karten</button>
-            <button type="button" class="btn small" data-add-block="testimonials">+ Testimonials</button>
-            <button type="button" class="btn small" data-add-block="cta">+ CTA</button>
-            <button type="button" class="btn small" data-add-block="feature">+ Feature</button>
-            <button type="button" class="btn small" data-add-block="marquee">+ Marquee</button>
-            <button type="button" class="btn small" data-add-block="image">+ Bild</button>
-          </div>
-        </div>
-        <div id="blocks-container"></div>
-
-        <!-- Fallback Markdown (shown if no blocks) -->
-        <details class="fallback-md">
-          <summary class="muted-label" style="cursor:pointer;">Fallback-Text (Markdown, nur ohne Blöcke)</summary>
-          <textarea name="content" rows="10" style="margin-top:8px;"></textarea>
-        </details>
+  <!-- ---------------- Page editor (Page Builder) ---------------- -->
+  <section class="view pb-view" id="view-page-editor" hidden>
+    <!-- Top bar -->
+    <div class="pb-topbar">
+      <button class="btn small" data-back="pages">← Zurück</button>
+      <span class="pb-title" id="page-editor-title">Seite bearbeiten</span>
+      <div class="pb-topbar-actions">
+        <button type="button" class="btn small" id="pb-settings-btn">⚙ Einstellungen</button>
+        <button type="button" class="btn small" id="pb-preview-btn">↗ Vorschau</button>
+        <button type="submit" form="page-form" class="btn primary small">💾 Speichern</button>
+        <button type="button" class="btn danger small" id="page-delete-btn" hidden>✕</button>
       </div>
-      <aside class="editor-sidebar">
-        <div class="card">
-          <h3 style="margin-top:0;">Veröffentlichung</h3>
-          <label>Status
-            <select name="status">
-              <option value="draft">Entwurf</option>
-              <option value="published">Veröffentlicht</option>
-            </select>
-          </label>
-          <label>URL-Slug <span class="muted-label">leer = automatisch</span>
-            <input name="slug" />
-          </label>
-          <label style="display:flex;align-items:center;gap:8px;margin-top:8px;">
-            <input type="checkbox" name="show_in_menu" checked style="width:auto;" />
-            <span>Im Menü anzeigen</span>
-          </label>
-          <label>Reihenfolge
-            <input name="sort_order" type="number" value="0" />
-          </label>
+    </div>
+
+    <!-- Split: blocks panel | preview iframe -->
+    <div class="pb-split">
+      <!-- Left: blocks panel -->
+      <div class="pb-panel" id="pb-panel">
+        <form id="page-form">
+          <!-- hidden fields -->
+          <input type="hidden" name="title" />
+          <input type="hidden" name="slug" />
+          <input type="hidden" name="excerpt" />
+          <input type="hidden" name="content" />
+          <input type="hidden" name="status" value="published" />
+          <input type="hidden" name="sort_order" value="0" />
+          <input type="hidden" name="show_in_menu" value="1" />
+          <input type="hidden" name="meta_title" />
+          <input type="hidden" name="meta_description" />
+
+          <!-- Add block buttons -->
+          <div class="pb-add-section">
+            <div class="pb-add-label">Block hinzufügen</div>
+            <div class="pb-add-btns">
+              <button type="button" class="pb-add-btn" data-add-block="hero">🏔<span>Hero</span></button>
+              <button type="button" class="pb-add-btn" data-add-block="text">📝<span>Text</span></button>
+              <button type="button" class="pb-add-btn" data-add-block="feature">⭐<span>Feature</span></button>
+              <button type="button" class="pb-add-btn" data-add-block="cards">🃏<span>Karten</span></button>
+              <button type="button" class="pb-add-btn" data-add-block="testimonials">💬<span>Quotes</span></button>
+              <button type="button" class="pb-add-btn" data-add-block="cta">📣<span>CTA</span></button>
+              <button type="button" class="pb-add-btn" data-add-block="marquee">✦<span>Marquee</span></button>
+              <button type="button" class="pb-add-btn" data-add-block="image">🖼<span>Bild</span></button>
+            </div>
+          </div>
+
+          <!-- Block list -->
+          <div id="blocks-container"></div>
+
+          <!-- Fallback Markdown -->
+          <details class="fallback-md" style="margin:12px 16px 0;">
+            <summary class="muted-label" style="cursor:pointer;font-size:11px;">Fallback-Text (Markdown)</summary>
+            <textarea name="content-md" rows="6" style="margin-top:6px;font-size:12px;"></textarea>
+          </details>
+        </form>
+      </div>
+
+      <!-- Right: live preview -->
+      <div class="pb-preview-wrap">
+        <div class="pb-preview-bar">
+          <span class="pb-preview-label">Live-Vorschau</span>
+          <div class="pb-device-btns">
+            <button type="button" class="pb-device-btn active" data-device="desktop" title="Desktop">🖥</button>
+            <button type="button" class="pb-device-btn" data-device="tablet" title="Tablet">📱</button>
+            <button type="button" class="pb-device-btn" data-device="mobile" title="Mobil">📲</button>
+          </div>
+          <input class="pb-url-input" id="pb-url-input" placeholder="http://localhost:4321" title="Frontend-URL" />
         </div>
-        <div class="card">
-          <h3 style="margin-top:0;">SEO</h3>
-          <label>Meta-Titel
-            <input name="meta_title" />
-          </label>
-          <label>Meta-Beschreibung
-            <textarea name="meta_description" rows="3"></textarea>
-          </label>
+        <div class="pb-iframe-wrap" id="pb-iframe-wrap">
+          <iframe id="pb-iframe" class="pb-iframe" src="about:blank" title="Vorschau"></iframe>
         </div>
-      </aside>
-    </form>
+      </div>
+    </div>
   </section>
+
+  <!-- Settings drawer (overlay) -->
+  <div class="pb-settings-overlay" id="pb-settings-overlay" hidden>
+    <div class="pb-settings-drawer">
+      <div class="pb-settings-header">
+        <strong>Seiten-Einstellungen</strong>
+        <button type="button" class="btn tiny" id="pb-settings-close">✕</button>
+      </div>
+      <div class="pb-settings-body">
+        <label>Titel<input id="ps-title" /></label>
+        <label>Kurzbeschreibung<textarea id="ps-excerpt" rows="2"></textarea></label>
+        <label>URL-Slug <span class="muted-label">leer = automatisch</span><input id="ps-slug" /></label>
+        <label style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+          <input type="checkbox" id="ps-show-in-menu" checked style="width:auto;" />
+          <span>Im Menü anzeigen</span>
+        </label>
+        <label>Reihenfolge<input id="ps-sort-order" type="number" value="0" /></label>
+        <hr style="border:none;border-top:1px solid var(--border);margin:16px 0;" />
+        <strong style="font-size:12px;">SEO</strong>
+        <label style="margin-top:8px;">Meta-Titel<input id="ps-meta-title" /></label>
+        <label>Meta-Beschreibung<textarea id="ps-meta-description" rows="3"></textarea></label>
+      </div>
+    </div>
+  </div>
 
   <!-- ---------------- Posts list ---------------- -->
   <section class="view" id="view-posts" hidden>
