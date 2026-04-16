@@ -212,6 +212,64 @@
     ]},
   };
 
+  function blockPreview(block) {
+    const e = escapeHtml;
+    if (block.type === "hero") {
+      return `<div class="bp bp-hero">
+        ${block.image ? `<div class="bp-hero-img"><img src="${e(block.image)}" alt="" /></div>` : ""}
+        <div class="bp-hero-body">
+          ${block.eyebrow ? `<div class="bp-eyebrow">${e(block.eyebrow)}</div>` : ""}
+          ${block.title ? `<div class="bp-h1">${e(block.title)}</div>` : '<div class="bp-h1 bp-placeholder">Hero Titel...</div>'}
+          ${block.subtitle ? `<div class="bp-sub">${e(block.subtitle)}</div>` : ""}
+          ${block.cta_text ? `<span class="bp-btn">${e(block.cta_text)} →</span>` : ""}
+        </div>
+      </div>`;
+    }
+    if (block.type === "text") {
+      const text = (block.content || "").slice(0, 200);
+      return `<div class="bp bp-text">
+        <div class="bp-prose">${text ? e(text) + (block.content && block.content.length > 200 ? "..." : "") : '<span class="bp-placeholder">Text eingeben...</span>'}</div>
+      </div>`;
+    }
+    if (block.type === "cards") {
+      const items = (block.items || "").split("\n").filter((l) => l.trim()).slice(0, 4);
+      return `<div class="bp bp-cards">
+        ${block.title ? `<div class="bp-h2">${e(block.title)}</div>` : ""}
+        <div class="bp-cards-grid">
+          ${items.length ? items.map((line) => {
+            const [title] = line.split("|");
+            return `<div class="bp-card-item">${e((title || "").trim())}</div>`;
+          }).join("") : '<div class="bp-card-item bp-placeholder">Karten hinzufügen...</div>'}
+        </div>
+      </div>`;
+    }
+    if (block.type === "testimonials") {
+      const items = (block.items || "").split("\n\n").filter((t) => t.trim()).slice(0, 3);
+      return `<div class="bp bp-testimonials">
+        ${block.title ? `<div class="bp-h2">${e(block.title)}</div>` : ""}
+        <div class="bp-testi-grid">
+          ${items.length ? items.map((t) => `<div class="bp-testi-item">„ ${e(t.trim().slice(0, 80))}..."</div>`).join("") : '<div class="bp-testi-item bp-placeholder">Zitate einfügen...</div>'}
+        </div>
+      </div>`;
+    }
+    if (block.type === "cta") {
+      const isDark = (block.style || "dark") === "dark";
+      return `<div class="bp bp-cta ${isDark ? "bp-cta-dark" : "bp-cta-light"}">
+        ${block.eyebrow ? `<div class="bp-eyebrow">${e(block.eyebrow)}</div>` : ""}
+        ${block.title ? `<div class="bp-h2">${e(block.title)}</div>` : '<div class="bp-h2 bp-placeholder">CTA Titel...</div>'}
+        ${block.text ? `<div class="bp-sub">${e(block.text)}</div>` : ""}
+        ${block.cta_text ? `<span class="bp-btn">${e(block.cta_text)} →</span>` : ""}
+      </div>`;
+    }
+    if (block.type === "image") {
+      return `<div class="bp bp-image">
+        ${block.src ? `<img src="${e(block.src)}" alt="${e(block.alt || "")}" />` : '<div class="bp-placeholder">Bild-URL einfügen...</div>'}
+        ${block.caption ? `<div class="bp-caption">${e(block.caption)}</div>` : ""}
+      </div>`;
+    }
+    return `<div class="bp"><span class="bp-placeholder">Block: ${e(block.type)}</span></div>`;
+  }
+
   function renderBlocks() {
     const container = $("#blocks-container");
     if (!state.blocks.length) {
@@ -231,20 +289,40 @@
           <div class="block-header">
             <span class="block-type">${def.icon} ${def.label}</span>
             <div class="block-actions">
+              <button type="button" class="btn tiny" data-toggle-block="${i}">✏️</button>
               ${i > 0 ? `<button type="button" class="btn tiny" data-move-block="${i}" data-dir="-1">↑</button>` : ""}
               ${i < state.blocks.length - 1 ? `<button type="button" class="btn tiny" data-move-block="${i}" data-dir="1">↓</button>` : ""}
               <button type="button" class="btn tiny danger" data-remove-block="${i}">✕</button>
             </div>
           </div>
-          <div class="block-fields">${fieldsHtml}</div>
+          <div class="block-preview" data-preview="${i}">${blockPreview(block)}</div>
+          <div class="block-fields" data-fields="${i}" hidden>${fieldsHtml}</div>
         </div>`;
     }).join("");
 
-    // Bind field changes
+    // Bind field changes — update preview live
     container.querySelectorAll("[data-block][data-key]").forEach((el) => {
       el.addEventListener("input", () => {
         const idx = Number(el.dataset.block);
         state.blocks[idx][el.dataset.key] = el.value;
+        const previewEl = container.querySelector(`[data-preview="${idx}"]`);
+        if (previewEl) previewEl.innerHTML = blockPreview(state.blocks[idx]);
+      });
+    });
+    // Toggle edit/preview
+    container.querySelectorAll("[data-toggle-block]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const i = btn.dataset.toggleBlock;
+        const fields = container.querySelector(`[data-fields="${i}"]`);
+        const preview = container.querySelector(`[data-preview="${i}"]`);
+        if (fields && preview) {
+          const isEditing = !fields.hidden;
+          fields.hidden = isEditing;
+          preview.hidden = !isEditing;
+          btn.textContent = isEditing ? "✏️" : "👁";
+          // Refresh preview when switching back
+          if (isEditing) preview.innerHTML = blockPreview(state.blocks[Number(i)]);
+        }
       });
     });
     // Bind move
