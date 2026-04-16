@@ -114,6 +114,41 @@ const { blocks = [] } = Astro.props;
     );
   }
 
+  if (block.type === "feature") {
+    const isDark = (block.style || "dark") === "dark";
+    const bullets = (block.bullets || "").split("\n").filter((l: string) => l.trim());
+    return (
+      <section class="mx-auto max-w-5xl px-6 lg:px-10 py-16">
+        <div class:list={[
+          "relative overflow-hidden rounded-3xl p-10 md:p-16",
+          isDark ? "bg-[color:var(--color-ink)] text-[color:var(--color-bg)]" : "bg-[color:var(--color-bg-2)] border border-[color:var(--color-line)]"
+        ]}>
+          {block.eyebrow && <span class="eyebrow" style={isDark ? "color:var(--color-clay)" : undefined}>{block.eyebrow}</span>}
+          {block.title && <h2 class:list={["mt-4 font-display text-4xl", isDark ? "text-[color:var(--color-bg)]" : ""]}>{block.title}</h2>}
+          {block.text && <p class:list={["mt-6 max-w-2xl leading-relaxed", isDark ? "text-[color:var(--color-bg-2)]" : "text-[color:var(--color-mute)]"]}>{block.text}</p>}
+          {bullets.length > 0 && (
+            <ul class="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-3 max-w-2xl">
+              {bullets.map((b: string) => (
+                <li class:list={["flex items-start gap-2 text-sm", isDark ? "text-[color:var(--color-bg-2)]" : "text-[color:var(--color-mute)]"]}>
+                  <span class="mt-1 shrink-0 w-2 h-2 rounded-full bg-[color:var(--color-clay)]" aria-hidden="true" />
+                  {b.trim()}
+                </li>
+              ))}
+            </ul>
+          )}
+          {block.cta_text && block.cta_href && (
+            <a href={block.cta_href} class:list={[
+              "mt-10 inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm font-medium transition",
+              isDark ? "bg-[color:var(--color-clay)] text-[color:var(--color-bg)] hover:bg-[color:var(--color-clay-hover)]" : "bg-[color:var(--color-ink)] text-[color:var(--color-bg)] hover:bg-[color:var(--color-clay)]"
+            ]}>
+              {block.cta_text} <span aria-hidden="true">→</span>
+            </a>
+          )}
+        </div>
+      </section>
+    );
+  }
+
   if (block.type === "image") return (
     <section class="mx-auto max-w-4xl px-6 lg:px-10 py-16">
       {block.src && (

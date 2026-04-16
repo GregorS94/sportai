@@ -784,6 +784,36 @@ label input, label select, label textarea { margin-top: 4px; }
   border: 1px solid #ece7df;
 }
 
+/* feature block */
+.bp-feature {
+  padding: 14px 18px;
+  border-radius: 12px;
+}
+.bp-feature-dark {
+  background: #2b2a26;
+  color: #fff;
+}
+.bp-feature-dark .bp-h1 { color: #f4ede3; }
+.bp-feature-dark .bp-eyebrow { color: #c9936b; }
+.bp-feature-dark .bp-sub { color: #c8c4bc; }
+.bp-feature-dark .bp-btn { background: #c9936b; }
+.bp-feature-dark .bp-bullet { color: #d4cec6; }
+.bp-feature-light {
+  background: #f4ede3;
+  border: 1px solid #ece7df;
+}
+.bp-bullets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+  margin: 8px 0;
+}
+.bp-bullet {
+  font-size: 11px;
+  color: #4a4640;
+  line-height: 1.4;
+}
+
 /* image block */
 .bp-image { padding: 4px 0; }
 .bp-image img {

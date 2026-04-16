@@ -205,6 +205,15 @@
       { key: "cta_href", label: "Button-Link", type: "text" },
       { key: "style", label: "Stil (dark / light)", type: "text" },
     ]},
+    feature: { label: "Feature", icon: "⭐", fields: [
+      { key: "eyebrow", label: "Eyebrow", type: "text" },
+      { key: "title", label: "Titel", type: "text" },
+      { key: "text", label: "Text", type: "textarea" },
+      { key: "bullets", label: "Bullet-Punkte (eine pro Zeile)", type: "textarea-lg" },
+      { key: "cta_text", label: "Button-Text", type: "text" },
+      { key: "cta_href", label: "Button-Link", type: "text" },
+      { key: "style", label: "Stil (dark / light)", type: "text" },
+    ]},
     image: { label: "Bild", icon: "🖼", fields: [
       { key: "src", label: "Bild-URL", type: "text" },
       { key: "alt", label: "Alt-Text", type: "text" },
@@ -258,6 +267,17 @@
         ${block.eyebrow ? `<div class="bp-eyebrow">${e(block.eyebrow)}</div>` : ""}
         ${block.title ? `<div class="bp-h2">${e(block.title)}</div>` : '<div class="bp-h2 bp-placeholder">CTA Titel...</div>'}
         ${block.text ? `<div class="bp-sub">${e(block.text)}</div>` : ""}
+        ${block.cta_text ? `<span class="bp-btn">${e(block.cta_text)} →</span>` : ""}
+      </div>`;
+    }
+    if (block.type === "feature") {
+      const isDark = (block.style || "dark") === "dark";
+      const bullets = (block.bullets || "").split("\n").filter((l) => l.trim()).slice(0, 6);
+      return `<div class="bp bp-feature ${isDark ? "bp-feature-dark" : "bp-feature-light"}">
+        ${block.eyebrow ? `<div class="bp-eyebrow">${e(block.eyebrow)}</div>` : ""}
+        ${block.title ? `<div class="bp-h1">${e(block.title)}</div>` : '<div class="bp-h1 bp-placeholder">Titel...</div>'}
+        ${block.text ? `<div class="bp-sub">${e(block.text)}</div>` : ""}
+        ${bullets.length ? `<div class="bp-bullets">${bullets.map((b) => `<span class="bp-bullet">• ${e(b.trim())}</span>`).join("")}</div>` : ""}
         ${block.cta_text ? `<span class="bp-btn">${e(block.cta_text)} →</span>` : ""}
       </div>`;
     }
