@@ -1,27 +1,78 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2822
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
-\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+"""SportAI – Live-Spiel-Dashboard.
 
-\f0\fs24 \cf0 import streamlit as st\
-from scraper.kicker import fetch_kicker_data\
-\
-st.set_page_config(page_title="SportAI \'96 Tor-Prognose", layout="wide")\
-st.title("\uc0\u9917  SportAI: Analyse Live-Spiele")\
-\
-st.write("Dieses Dashboard zeigt Live-Spieldaten (aktuell nur von kicker.de).")\
-st.write("Weitere Quellen und Vorhersagemodell folgen.")\
-\
-if st.button("\uc0\u55357 \u56580  Daten aktualisieren"):\
-    spiele = fetch_kicker_data()\
-    if spiele:\
-        st.subheader("Aktuelle Spiele (Kicker.de):")\
-        for spiel in spiele:\
-            st.write(f"\uc0\u55356 \u56730  \{spiel['team1']\} vs \{spiel['team2']\}")\
-            st.write(f"\uc0\u9201  \{spiel['minute']\}, Spielstand: \{spiel['score']\}")\
-            st.markdown("---")\
-    else:\
-        st.warning("Keine Spieldaten gefunden oder Fehler beim Abruf.")\
-}
+Zeigt pro Spiel exakt die gewünschten Stats (Scope Score, Gefahr-Score,
+Ballbesitz, Torschüsse, Gef. Angriffe, Ecken, xG sowie Torschüsse der
+letzten 10 Minuten). Datenquelle ist aktuell Mock-Data.
+"""
+
+import os
+import sys
+
+# Repo-Root in den Pfad legen, damit "app.core" auch via
+# `streamlit run app/streamlit_app.py` importierbar ist.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+import streamlit as st
+
+from app.core import format_match, gefahr_score, get_matches, scope_score
+from app.core.models import Match
+
+st.set_page_config(page_title="SportAI – Tor-Prognose", layout="wide")
+st.title("⚽ SportAI: Analyse Live-Spiele")
+st.caption("Live-Stats pro Spiel · Datenquelle: Mock-Data (echte API folgt)")
+
+
+def render_match(match: Match) -> None:
+    h, a = match.home, match.away
+
+    st.subheader(f"{h.flag} {h.name} vs {a.flag} {a.name}")
+    st.write(f"⏱ {match.minute}'  |  ⚽ {match.score_home} : {match.score_away}")
+
+    # Eigene Kennzahlen prominent
+    c1, c2 = st.columns(2)
+    c1.metric("📊 Scope Score", f"{scope_score(h)} / {scope_score(a)}")
+    c2.metric("🎯 Gefahr-Score", f"{gefahr_score(h)} / {gefahr_score(a)}")
+
+    # Basis-Stats als Tabelle (Heim / Auswärts)
+    st.table(
+        {
+            "Stat": [
+                "🔵 Ballbesitz",
+                "🎯 Torschüsse",
+                "⚡ Gef. Angriffe",
+                "🚩 Ecken",
+                "📐 xG",
+                "🔥 Torschüsse (letzte 10 Min)",
+            ],
+            h.name: [
+                f"{round(h.possession)}%",
+                h.shots,
+                h.dangerous_attacks,
+                h.corners,
+                f"{h.xg:.2f}",
+                h.shots_last10,
+            ],
+            a.name: [
+                f"{round(a.possession)}%",
+                a.shots,
+                a.dangerous_attacks,
+                a.corners,
+                f"{a.xg:.2f}",
+                a.shots_last10,
+            ],
+        }
+    )
+
+    # Exaktes Telegram-Layout als Vorschau
+    with st.expander("📱 Telegram-Vorschau (exaktes Layout)"):
+        st.code(format_match(match), language=None)
+
+    st.markdown("---")
+
+
+matches = get_matches()
+if matches:
+    for match in matches:
+        render_match(match)
+else:
+    st.warning("Keine Spieldaten gefunden.")
